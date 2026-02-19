@@ -18,7 +18,7 @@ except ImportError:
             "requires_consumer_notice": False,
             "governing_law": "This agreement is governed by the laws of the state of Maryland.",
             "notice_period_text": "OPTIONS, however, may end services with 3 calendar days' written notice.",
-            "pdf_margins": {"top": 0.4, "bottom": 0.4, "left": 0.4, "right": 0.4},
+           'pdf_margins': {'top': 0.2, 'bottom': 0.3, 'left': 0.4, 'right': 0.4}
             
            
         }
@@ -59,7 +59,7 @@ def json_to_pdf(data_dict: dict):
 
     requires_live_in = branch_config.get('requires_live_in_text', False)
     requires_consumer_notice = branch_config.get('requires_consumer_notice', False)
-    margins = branch_config.get('pdf_margins', {'top': 0.4, 'bottom': 0.4, 'left': 0.4, 'right': 0.4})
+    margins = branch_config.get('pdf_margins', {'top': 0.2, 'bottom': 0.4, 'left': 0.4, 'right': 0.4})
     
     # Extract data
     office_name = safe_get('office_name', 'Options For Senior America')
@@ -91,7 +91,7 @@ def json_to_pdf(data_dict: dict):
     requires_consumer_notice = branch_config.get('requires_consumer_notice', False)
     
     # PDF margins from branch config
-    margins = branch_config.get('pdf_margins', {'top': 0.4, 'bottom': 0.4, 'left': 0.4, 'right': 0.4})
+    margins = branch_config.get('pdf_margins', {'top': 0.2, 'bottom': 0.4, 'left': 0.4, 'right': 0.4})
     
     # Additional fields
     frequency_duration = safe_get('frequency_duration', '')
@@ -119,9 +119,9 @@ def json_to_pdf(data_dict: dict):
         # Get hazards data and replace newlines with HTML breaks
         hazards_val = safe_get('hazards', 'None Reported').replace('\n', '<br/>')
         hazards_html = f"""
-        <div style="font-size:13.33px; margin-top:10px; line-height:16px;">
+        <div style="font-size:10px; margin-top:8px; line-height:16px;">
             <p><b><u>HAZARDS:</u></b></p>
-            <p style="margin-top:5px;">{hazards_val}</p>
+            <p style="margin-top:4px;">{hazards_val}</p>
         </div>
         """
         
@@ -131,9 +131,9 @@ def json_to_pdf(data_dict: dict):
 
     if branch_code in competency_branches:
         competency_html = """
-        <div style="font-size:13.33px; margin-top:10px; line-height:16px;">
+        <div style="font-size:10px; margin-top:8px; line-height:16px;">
             <p><b><u>CAREGIVER COMPETENCY REQUIREMENTS:</u></b></p>
-            <p style="margin-top:5px;">Before assigning a Direct Care Worker to provide services to a consumer, 
+            <p style="margin-top:4px;">Before assigning a Direct Care Worker to provide services to a consumer, 
             Options shall ensure that the Direct Care Worker has obtained a valid nurse's aide license in 
             Pennsylvania, or has successfully completed a training program as stipulated in 
             Pennsylvania's regulations, section 611.55, item 3.</p>
@@ -162,7 +162,7 @@ def json_to_pdf(data_dict: dict):
 
     # Combine into one variable
     final_charges_html = f"""
-    <div style="font-size:13.33px; margin-top:10px; line-height:16px;">
+    <div style="font-size:10px; margin-top:8px; line-height:16px;">
         <p>{charges_header}{perc_text}{charges_body}</p>
     </div>
     """
@@ -187,7 +187,7 @@ def json_to_pdf(data_dict: dict):
 
     # Build the dynamic HTML block
     federal_holidays_html = f"""
-    <div style="font-size:13.33px; margin-top:10px; line-height:16px;">
+    <div style="font-size:10px; margin-top:8px; line-height:16px;">
         <p><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, 
         you will be charged "time and a half" for those days (50% more than your usual daily charge). 
         We apply those surcharges on the {holiday_count} holidays as follows: {formatted_holidays}.
@@ -214,7 +214,7 @@ def json_to_pdf(data_dict: dict):
 
     if branch_code in live_in_branches:
         live_in_services_html = """
-        <div style="font-size:13.33px; margin-top:10px; line-height:16px;">
+        <div style="font-size:10px; margin-top:8px; line-height:16px;">
             <p><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; 
             OPTIONS care providers who provide live-in services have a standard work schedule of 
             twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of 
@@ -254,10 +254,10 @@ def json_to_pdf(data_dict: dict):
 
     # Build the HTML block using 13px font and 14px line-height as per PHP snippet
     needs_and_valuables_html = f"""
-    <div style="font-size:13px; margin-top:10px; line-height:14px;">
+    <div style="font-size:10px; margin-top:8px; line-height:14px;">
         <p><b><u>NEEDS ASSESSMENT & PLAN OF CARE:</u></b> &nbsp; {needs_assessment_body}</p>
     </div>
-    <div style="font-size:13px; margin-top:10px; line-height:14px;">
+    <div style="font-size:10px; margin-top:8px; line-height:14px;">
         <p><b><u>YOUR VALUABLES:</u></b> &nbsp; {valuables_body}</p>
     </div>
     """
@@ -276,7 +276,7 @@ def json_to_pdf(data_dict: dict):
                        "OPTIONS may end services under this agreement by giving 3 calendar days notice in writing.")
 
     notice_period_html = f"""
-    <div style="font-size:13px; margin-top:10px; line-height:14px;">
+    <div style="font-size:10px; margin-top:8px; line-height:14px;">
         <p><b><u>NOTICE PERIOD:</u></b> &nbsp; {notice_body}</p>
     </div>
     """
@@ -303,7 +303,7 @@ def json_to_pdf(data_dict: dict):
     # Check if branch is in the main list OR if it's DC branch specifically in DC state
     if branch_code in med_branches or (branch_code in ['dchomecare', 'dchomecare_staging'] and care_state == "DC"):
         medication_html = """
-        <div style="font-size:13px; margin-top:10px; line-height:14px;">
+        <div style="font-size:10px; margin-top:8px; line-height:14px;">
             <p><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; For those care recipients who require 
             administration of medication, if the care recipient is not cognitively competent, and a 
             family member is unavailable to administer the medication on a weekly basis, we will 
@@ -333,7 +333,7 @@ def json_to_pdf(data_dict: dict):
         )
 
     vehicle_html = f"""
-    <div style="font-size:13px; margin-top:10px; line-height:14px;">
+    <div style="font-size:10px; margin-top:8px; line-height:14px;">
         <p><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; {vehicle_body}</p>
     </div>
     """
@@ -367,7 +367,7 @@ def json_to_pdf(data_dict: dict):
             break
 
     general_provisions_html = f"""
-    <div style="font-size:13px; margin-top:10px; line-height:14px;">
+    <div style="font-size:10px; margin-top:8px; line-height:14px;">
         <p><b><u>GENERAL PROVISIONS:</u></b></p>
         <ol type="a" style="padding-left: 20px;">
             <li style="margin-bottom: 3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</li>
@@ -491,7 +491,7 @@ def json_to_pdf(data_dict: dict):
     # 2. GEORGIA BRANCHES
     elif branch_lower in ['athomecare', 'athomecare_staging', 'scgahomecare', 'scgahomecare_staging']:
         rights_html = """
-        <div style="font-size:11px; margin-top:10px;">
+        <div style="font-size:11px; margin-top:8px;">
             <p style="text-align:center; margin-bottom:5px;"><b><u>NOTICE OF RIGHTS AND RESPONSIBILITIES</u></b></p>
             <p style="text-align:center; margin-bottom:5px;"><b>You are a valued customer, and you have the following rights and responsibilities</b></p>
             <ol type="1" style="padding-left: 26px; margin:0;">
@@ -547,7 +547,7 @@ def json_to_pdf(data_dict: dict):
 
         rights_html = f"""
         <div style="font-size:11px;">
-            <p style="font-size:14px;text-align:center;margin-bottom:5px;margin-top:20px;"><b><u>Notice of Patients' Rights and Responsibilities</u></b></p>
+            <p style="font-size:14px;text-align:center;margin-bottom:5px;margin-top:18px;"><b><u>Notice of Patients' Rights and Responsibilities</u></b></p>
             <p style="font-size:11px;margin-bottom:5px;">YOU ARE A VALUED CUSTOMER, AND YOU HAVE THE FOLLOWING RIGHTS AND RESPONSIBILITIES:</p>
             <ol type="1" style="padding-left: 26px;margin:0;">
                 <li>Right to accept or refuse services.</li>
@@ -921,12 +921,12 @@ def json_to_pdf(data_dict: dict):
             margin-left: {margins['left']}in;
             margin-right: {margins['right']}in;
         }}
-        body {{ font-family: Helvetica, Arial, sans-serif; font-size: 8.8pt; line-height: 1.15; color: #000; }}
+        body {{ font-family: Helvetica, Arial, sans-serif; font-size: 7pt; line-height: 1.15; color: #000; }}
         .page-break {{ pdf-next-page: true; }}
         
         /* Page 1 Specific Styles */
         .header-table {{ width: 100%; border-collapse: collapse; }}
-        .office-info {{ width: 45%; font-size: 8.5pt; vertical-align: top; }}
+        .office-info {{ width: 45%; font-size: 7pt; vertical-align: top; }}
         .title-info {{ width: 55%; text-align: right; vertical-align: top; }}
         .logo-container {{ text-align: right; margin-bottom: 10px; }}
         .logo-img {{ max-width: 220px; max-height: 90px; display: block; margin-left: auto; margin-right: 0; }}
@@ -940,8 +940,8 @@ def json_to_pdf(data_dict: dict):
         .legal-text {{ text-align: justify; margin-bottom: 8px; }}
 
         /* Page 2 Specific Styles */
-        .section-title {{ font-size: 11pt; text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px; }}
-        .sub-section-title {{ font-size: 11pt; text-align: center; font-weight: bold; text-decoration: underline; margin-top: 20px; margin-bottom: 10px; }}
+        .section-title {{ font-size: 10pt; text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px; }}
+        .sub-section-title {{ font-size: 10pt; text-align: center; font-weight: bold; text-decoration: underline; margin-top: 20px; margin-bottom: 10px; }}
         
         ol {{ padding-left: 25px; margin-top: 0; }}
         ol li {{ margin-bottom: 5px; text-align: justify; }}
@@ -1080,7 +1080,7 @@ def json_to_pdf(data_dict: dict):
 
     # ========== PAGE 1 CONTINUATION: ADDITIONAL TERMS ==========
     page1_cont = f"""
-    <div class="force-page-break"></div>
+  <div style="page-break-before: always;">
     
     {needs_and_valuables_html}
 
@@ -1130,7 +1130,7 @@ def json_to_pdf(data_dict: dict):
 
     # ========== PAGE 2: PATIENT RIGHTS AND RESPONSIBILITIES ==========
     page2 = f"""
-    <div class="force-page-break"></div>
+     <div style="page-break-before: always;">
     
     {rights_html}
 
@@ -1175,6 +1175,7 @@ def json_to_pdf(data_dict: dict):
 
     # ========== PAGE 3: EFT AUTHORIZATION ==========
     page3 = f"""
+    <div style="page-break-before: always;">
    <div style="text-align: center; margin-top: 10px;">
         <div style="font-size: 14pt; font-weight: bold; margin-bottom: 5px;">Authorization for a Repeating Electronic Funds Transfer</div>
         <div style="font-size: 9pt; font-style: italic; margin-bottom: 15px;">(Save time and postage. Avoid interest charges, late payments, and termination notices)</div>
@@ -1246,7 +1247,7 @@ def json_to_pdf(data_dict: dict):
     page3_1 = ""
     if requires_consumer_notice:
         page3_1 = f"""
-    <div class="force-page-break"></div>
+      <div style="page-break-before: always;">
     
     <div class="section-title" style="text-align:center; font-weight:bold; text-decoration:underline; font-size:11pt; margin-top: 10px;">
         Consumer Notice

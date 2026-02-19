@@ -6,12 +6,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from typing import List, Optional
 from datetime import datetime, timedelta
 import secrets
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import os
+from utils import send_reset_email
 
-# Add these missing imports
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -117,45 +114,22 @@ def login(
 
 # -------------------- FORGOT PASSWORD ENDPOINT --------------------
 @app.post("/forgot-password")
-def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    """Generate and send password reset token"""
-    try:
-        # Find user by username (email)
-        user = db.query(models.User).filter(models.User.username == request.username).first()
-        
-        if not user:
-            # Don't reveal that user doesn't exist for security
-            return {"message": "If your email exists in our system, you will receive a reset link."}
-        
-        # Generate a secure token
+def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.username == request.email).first()
+
+    if user:
         reset_token = secrets.token_urlsafe(32)
-        expiry = datetime.now() + timedelta(hours=24)  # Token valid for 24 hours
-        
-        # Store token in memory (for development)
         reset_tokens[reset_token] = {
             "user_id": user.id,
             "username": user.username,
-            "expires_at": expiry,
+            "expires_at": datetime.now() + timedelta(hours=24),
             "used": False
         }
-        
-        # Log the token for development (remove in production)
-        print(f"\n{'='*50}")
-        print(f"PASSWORD RESET TOKEN FOR: {user.username}")
-        print(f"Token: {reset_token}")
-        print(f"Reset link: http://localhost:5173/reset-password?token={reset_token}")
-        print(f"Expires at: {expiry}")
-        print(f"{'='*50}\n")
-        
-        # TODO: In production, send email with reset link
-        # send_reset_email(user.username, reset_token)
-        
-        return {"message": "If your email exists in our system, you will receive a reset link."}
-        
-    except Exception as e:
-        print(f"Error in forgot-password: {e}")
-        return {"message": "If your email exists in our system, you will receive a reset link."}
 
+        # CALL THE FUNCTION FROM UTILS.PY
+        send_reset_email(user.username, reset_token)
+
+    return {"message": "If your email exists, you will receive a link."}
 # -------------------- RESET PASSWORD ENDPOINT --------------------
 @app.post("/reset-password")
 def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
@@ -203,88 +177,10 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
         print(f"Error in reset-password: {e}")
         raise HTTPException(status_code=400, detail="Invalid or expired reset token")
 
-# -------------------- DEBUG - SHOW ACTIVE TOKENS (REMOVE IN PRODUCTION) --------------------
-@app.get("/debug/tokens")
-def debug_tokens():
-    """Show active reset tokens (DEBUG ONLY)"""
-    active_tokens = []
-    for token, data in reset_tokens.items():
-        if data["expires_at"] > datetime.now() and not data["used"]:
-            active_tokens.append({
-                "token": token[:10] + "...",  # Show only part of token for security
-                "username": data["username"],
-                "expires_at": data["expires_at"].isoformat(),
-                "reset_link": f"http://localhost:5173/reset-password?token={token}"
-            })
-    
-    return {
-        "active_tokens_count": len(active_tokens),
-        "active_tokens": active_tokens
-    }
 
-# -------------------- EMAIL SENDING FUNCTION (FOR PRODUCTION) --------------------
-def send_reset_email(to_email: str, token: str):
-    """Send password reset email - configure for production"""
-    # Configure your email settings
-    smtp_server = "smtp.gmail.com"  # Change this to your SMTP server
-    smtp_port = 587
-    sender_email = "your-email@gmail.com"  # Your email
-    sender_password = "your-app-password"  # Your app password
-    
-    # Create reset link
-    reset_link = f"http://localhost:5173/reset-password?token={token}"
-    
-    # Create email
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "Password Reset Request"
-    message["From"] = sender_email
-    message["To"] = to_email
-    
-    # HTML version
-    html = f"""
-    <html>
-      <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
-        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 10px 10px 0 0;">
-          <h2 style="color: white; margin: 0;">Password Reset Request</h2>
-        </div>
-        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e2e8f0;">
-          <p style="color: #333; font-size: 16px;">You requested to reset your password. Click the button below to proceed:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="{reset_link}" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">Reset Password</a>
-          </div>
-          <p style="color: #666; font-size: 14px;">This link will expire in 24 hours.</p>
-          <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-          <p style="color: #999; font-size: 12px;">© 2026 Options For Senior America. All rights reserved.</p>
-        </div>
-      </body>
-    </html>
-    """
-    
-    # Plain text version
-    text = f"""
-    Password Reset Request
-    
-    You requested to reset your password. Use the following link to proceed:
-    {reset_link}
-    
-    This link will expire in 24 hours.
-    
-    If you didn't request this, please ignore this email.
-    """
-    
-    part1 = MIMEText(text, "plain")
-    part2 = MIMEText(html, "html")
-    
-    message.attach(part1)
-    message.attach(part2)
-    
-    # Send email
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, to_email, message.as_string())
 
+    
+    
 # -------------------- AGREEMENT FORM PAGE --------------------
 @app.get("/agreement-form", response_class=HTMLResponse)
 async def agreement_form(request: Request):

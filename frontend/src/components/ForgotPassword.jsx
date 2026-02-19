@@ -17,7 +17,7 @@ const ForgotPassword = ({ switchToLogin }) => {
       const response = await fetch('http://127.0.0.1:8000/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email.trim().toLowerCase() }),
+       body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
 
       const data = await response.json();
@@ -153,7 +153,7 @@ const ForgotPassword = ({ switchToLogin }) => {
               cursor: 'pointer'
             }}
           >
-            ← Back to Login
+            Back to Login
           </button>
         </div>
       </div>

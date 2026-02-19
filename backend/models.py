@@ -74,6 +74,7 @@ class Branch(Base):
     is_corporate = Column(Boolean, default=False)
     address_line_2 = Column(Text, nullable=True) 
     fax = Column(String(25), nullable=True)
+    tel = Column(String)
 
     # Relationship
     agreements = relationship(
