@@ -119,7 +119,7 @@ def json_to_pdf(data_dict: dict):
         # Get hazards data and replace newlines with HTML breaks
         hazards_val = safe_get('hazards', 'None Reported').replace('\n', '<br/>')
         hazards_html = f"""
-        <div style="font-size:10px; margin-top:8px; line-height:16px;">
+        <div style="font-size:11px; margin-top:8px; line-height:16px;">
             <p><b><u>HAZARDS:</u></b></p>
             <p style="margin-top:4px;">{hazards_val}</p>
         </div>
@@ -131,7 +131,7 @@ def json_to_pdf(data_dict: dict):
 
     if branch_code in competency_branches:
         competency_html = """
-        <div style="font-size:10px; margin-top:8px; line-height:16px;">
+        <div style="font-size:11px; margin-top:8px; line-height:16px;">
             <p><b><u>CAREGIVER COMPETENCY REQUIREMENTS:</u></b></p>
             <p style="margin-top:4px;">Before assigning a Direct Care Worker to provide services to a consumer, 
             Options shall ensure that the Direct Care Worker has obtained a valid nurse's aide license in 
@@ -162,7 +162,7 @@ def json_to_pdf(data_dict: dict):
 
     # Combine into one variable
     final_charges_html = f"""
-    <div style="font-size:10px; margin-top:8px; line-height:16px;">
+    <div style="font-size:11px; margin-top:8px; line-height:16px;">
         <p>{charges_header}{perc_text}{charges_body}</p>
     </div>
     """
@@ -187,7 +187,7 @@ def json_to_pdf(data_dict: dict):
 
     # Build the dynamic HTML block
     federal_holidays_html = f"""
-    <div style="font-size:10px; margin-top:8px; line-height:16px;">
+    <div style="font-size:11px; margin-top:8px; line-height:16px;">
         <p><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, 
         you will be charged "time and a half" for those days (50% more than your usual daily charge). 
         We apply those surcharges on the {holiday_count} holidays as follows: {formatted_holidays}.
@@ -214,7 +214,7 @@ def json_to_pdf(data_dict: dict):
 
     if branch_code in live_in_branches:
         live_in_services_html = """
-        <div style="font-size:10px; margin-top:8px; line-height:16px;">
+        <div style="font-size:11px; margin-top:8px; line-height:16px;">
             <p><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; 
             OPTIONS care providers who provide live-in services have a standard work schedule of 
             twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of 
@@ -254,10 +254,10 @@ def json_to_pdf(data_dict: dict):
 
     # Build the HTML block using 13px font and 14px line-height as per PHP snippet
     needs_and_valuables_html = f"""
-    <div style="font-size:10px; margin-top:8px; line-height:14px;">
+    <div style="font-size:11px; margin-top:8px; line-height:14px;">
         <p><b><u>NEEDS ASSESSMENT & PLAN OF CARE:</u></b> &nbsp; {needs_assessment_body}</p>
     </div>
-    <div style="font-size:10px; margin-top:8px; line-height:14px;">
+    <div style="font-size:11px; margin-top:8px; line-height:14px;">
         <p><b><u>YOUR VALUABLES:</u></b> &nbsp; {valuables_body}</p>
     </div>
     """
@@ -276,7 +276,7 @@ def json_to_pdf(data_dict: dict):
                        "OPTIONS may end services under this agreement by giving 3 calendar days notice in writing.")
 
     notice_period_html = f"""
-    <div style="font-size:10px; margin-top:8px; line-height:14px;">
+    <div style="font-size:11px; margin-top:8px; line-height:14px;">
         <p><b><u>NOTICE PERIOD:</u></b> &nbsp; {notice_body}</p>
     </div>
     """
@@ -303,7 +303,7 @@ def json_to_pdf(data_dict: dict):
     # Check if branch is in the main list OR if it's DC branch specifically in DC state
     if branch_code in med_branches or (branch_code in ['dchomecare', 'dchomecare_staging'] and care_state == "DC"):
         medication_html = """
-        <div style="font-size:10px; margin-top:8px; line-height:14px;">
+        <div style="font-size:11px; margin-top:8px; line-height:14px;">
             <p><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; For those care recipients who require 
             administration of medication, if the care recipient is not cognitively competent, and a 
             family member is unavailable to administer the medication on a weekly basis, we will 
@@ -333,7 +333,7 @@ def json_to_pdf(data_dict: dict):
         )
 
     vehicle_html = f"""
-    <div style="font-size:10px; margin-top:8px; line-height:14px;">
+    <div style="font-size:11px; margin-top:8px; line-height:14px;">
         <p><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; {vehicle_body}</p>
     </div>
     """
@@ -367,7 +367,7 @@ def json_to_pdf(data_dict: dict):
             break
 
     general_provisions_html = f"""
-    <div style="font-size:10px; margin-top:8px; line-height:14px;">
+    <div style="font-size:11px; margin-top:8px; line-height:14px;">
         <p><b><u>GENERAL PROVISIONS:</u></b></p>
         <ol type="a" style="padding-left: 20px;">
             <li style="margin-bottom: 3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</li>

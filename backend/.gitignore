@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+env/
+
+# Secrets and Config
+.env
+alembic.ini
+
+# Database
+*.db
+*.sqlite3
+
+# Editor
+.vscode/
