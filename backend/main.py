@@ -7,7 +7,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 import secrets
 import os
-from utils import send_reset_email
+from email_config import send_reset_email
 
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -310,7 +310,19 @@ def download_agreement_pdf(
             branch_phone = branch.branch_phone or ""
             branch_fax = branch.branch_fax or branch.fax or ""
         
-        # 3. Create PDF data with all fields
+        # ===== ADD LOGO PATH HERE =====
+        import os
+        # Define the logo path - using the path where your logo exists
+        logo_path = r"C:\Users\User\service-agreement-app\Image111.bmp"
+        
+        # Verify if logo exists
+        if os.path.exists(logo_path):
+            print(f"✅ Logo found at: {logo_path}")
+        else:
+            print(f"⚠️ Logo not found at: {logo_path}")
+            logo_path = ""  # Set to empty if not found
+        
+        # 3. Create PDF data with all fields INCLUDING LOGO PATH
         pdf_data = {
             "branch_code": agreement.branch_code,
             "office_name": office_name,
@@ -369,6 +381,9 @@ def download_agreement_pdf(
             
             # Signatures
             "client_signature": agreement.client_signature or "",
+            
+            # ===== ADD LOGO PATH HERE =====
+            "logo_path": logo_path,
         }
 
         # Generate PDF
@@ -405,7 +420,6 @@ def download_agreement_pdf(
                 "Access-Control-Allow-Credentials": "true",
             }
         )
-
 # -------------------- BRANCHES API - SHOW ALL BRANCHES --------------------
 @app.get("/branches")
 def get_branches(db: Session = Depends(get_db)):
