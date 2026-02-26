@@ -9,8 +9,12 @@ import secrets
 import os
 from email_config import send_reset_email
 
+# ADD THIS IMPORT
+from config import Config
+
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+
 
 import models
 import schemas
@@ -282,8 +286,28 @@ def download_agreement_pdf(
             models.Branch.branch_code == agreement.branch_code
         ).first()
         
+        # ===== GET MILEAGE FROM BRANCH =====
+        branch_mileage = 0.67  # Default fallback
+        
+        if branch and hasattr(branch, 'mileage') and branch.mileage:
+            branch_mileage = float(branch.mileage)
+            print(f"Using branch mileage: {branch_mileage} for {agreement.branch_code}")
+        
+        # Create branch_data dictionary
+        branch_data = {}
+        if branch:
+            branch_data = {
+                "Mileage": branch_mileage,  # This matches your PHP $branchData->Mileage
+                "branch_code": branch.branch_code,
+                "office_name": getattr(branch, 'office_name', ''),
+            }
+        
+        # Handle branch not found in database
         if not branch:
             # Try to get branch info from config
+            from branch_config import get_branch_address, BRANCH_DISPLAY_NAMES
+            import re
+            
             addr = get_branch_address(agreement.branch_code)
             branch_state = 'MD'
             office_name = addr['office_name']
@@ -294,7 +318,6 @@ def download_agreement_pdf(
             branch_fax = addr['fax']
             
             # Extract state from display name
-            import re
             display_name = BRANCH_DISPLAY_NAMES.get(agreement.branch_code, "")
             state_match = re.search(r'\(([A-Z]{2})\)', display_name)
             branch_state = state_match.group(1) if state_match else 'MD'
@@ -310,21 +333,21 @@ def download_agreement_pdf(
             branch_phone = branch.branch_phone or ""
             branch_fax = branch.branch_fax or branch.fax or ""
         
-        # ===== ADD LOGO PATH HERE =====
-        import os
-        # Define the logo path - using the path where your logo exists
-        logo_path = r"C:\Users\User\service-agreement-app\Image111.bmp"
+        # ===== FIXED: GET LOGO PATH FROM CONFIG =====
+        # Remove the hardcoded path and use Config
+        logo_path = Config.get_logo_path()
         
-        # Verify if logo exists
-        if os.path.exists(logo_path):
-            print(f"✅ Logo found at: {logo_path}")
+        # Verify if logo exists (Config already does this, but keeping for clarity)
+        if logo_path:
+            print(f"Logo found at: {logo_path}")
         else:
-            print(f"⚠️ Logo not found at: {logo_path}")
+            print(f"Logo not found, using empty string")
             logo_path = ""  # Set to empty if not found
         
         # 3. Create PDF data with all fields INCLUDING LOGO PATH
         pdf_data = {
             "branch_code": agreement.branch_code,
+            "branch_data": branch_data,  # ADD THIS - Pass branch data
             "office_name": office_name,
             "address_line_1": street,
             "address_line_2": "",
@@ -365,7 +388,7 @@ def download_agreement_pdf(
             "care_type": agreement.care_type,
             "is_live_in": str(agreement.is_live_in).lower(),
             "hourly_rate": f"{float(agreement.hourly_rate):.2f}",
-            "mileage_rate": f"{float(agreement.mileage_rate):.2f}",
+            "mileage_rate": f"{branch_mileage:.2f}",  # CHANGED: Use branch_mileage instead of agreement.mileage_rate
             "vehicle_authorized": str(agreement.vehicle_authorized).lower(),
             "vehicle_authorization_initials": agreement.vehicle_authorization_initials or "",
             "PercCharged": str(getattr(agreement, 'perc_charged', '100')),
@@ -382,7 +405,7 @@ def download_agreement_pdf(
             # Signatures
             "client_signature": agreement.client_signature or "",
             
-            # ===== ADD LOGO PATH HERE =====
+            # ===== FIXED: LOGO PATH FROM CONFIG =====
             "logo_path": logo_path,
         }
 

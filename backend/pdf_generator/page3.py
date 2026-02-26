@@ -5,7 +5,7 @@ def generate_page3(data):
     """
     Generate Page 3 HTML - matches dynamic_sa_page3.php logic
     """
-    # Get values directly from data, not from a nested 'result'
+    # Get values directly from data
     care_title = data.get('care_title', '')
     care_first = data.get('care_first_name', '')
     care_last = data.get('care_last_name', '')
@@ -14,39 +14,103 @@ def generate_page3(data):
     clt_first = data.get('clt_first_name', '')
     clt_last = data.get('clt_last_name', '')
     
+    # Debug prints to see what's coming in
+    print(f"DEBUG - Page 3 - care_title: '{care_title}'")
+    print(f"DEBUG - Page 3 - care_first: '{care_first}'")
+    print(f"DEBUG - Page 3 - care_last: '{care_last}'")
+    print(f"DEBUG - Page 3 - clt_title: '{clt_title}'")
+    print(f"DEBUG - Page 3 - clt_first: '{clt_first}'")
+    print(f"DEBUG - Page 3 - clt_last: '{clt_last}'")
+    
+    # Clean and normalize names for comparison
+    care_first_clean = care_first.strip().lower() if care_first else ''
+    care_last_clean = care_last.strip().lower() if care_last else ''
+    clt_first_clean = clt_first.strip().lower() if clt_first else ''
+    clt_last_clean = clt_last.strip().lower() if clt_last else ''
+    
+    # Check if client and care recipient are the same person
+    same_person = (care_first_clean and care_last_clean and 
+                   care_first_clean == clt_first_clean and 
+                   care_last_clean == clt_last_clean)
+    
+    # For the same person, use the client's title (Mr.) for both
+    if same_person:
+        # Use client's title for both care recipient and client
+        display_care_title = clt_title
+        display_clt_title = clt_title
+        print(f"DEBUG - Same person detected, using client title '{clt_title}' for both")
+    else:
+        # Different people, use各自的 titles
+        display_care_title = care_title
+        display_clt_title = clt_title
+    
+    # Format names with proper spacing
+    care_name_parts = []
+    if display_care_title and display_care_title.strip():
+        care_name_parts.append(display_care_title.strip())
+    if care_first and care_first.strip():
+        care_name_parts.append(care_first.strip())
+    if care_last and care_last.strip():
+        care_name_parts.append(care_last.strip())
+    
+    care_name = ' '.join(care_name_parts) if care_name_parts else "Not Provided"
+    
+    clt_name_parts = []
+    if display_clt_title and display_clt_title.strip():
+        clt_name_parts.append(display_clt_title.strip())
+    if clt_first and clt_first.strip():
+        clt_name_parts.append(clt_first.strip())
+    if clt_last and clt_last.strip():
+        clt_name_parts.append(clt_last.strip())
+    
+    clt_name = ' '.join(clt_name_parts) if clt_name_parts else "Not Provided"
+    
+    print(f"DEBUG - Page 3 - Formatted care_name: '{care_name}'")
+    print(f"DEBUG - Page 3 - Formatted clt_name: '{clt_name}'")
+    
     html = '<div>'
     
     html += '''
-    <p style="text-align: center; font-weight:700; font-size: 18pt; font-family: Calibri; font-style: normal; text-decoration: underline;"><b>Authorization for a Repeating Electronic Funds Transfer</b></p>
-    <p style="text-align: center; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;">(Save time and postage. Avoid interest charges, late payments, and termination notices)</p>
+    <p style="text-align: center; font-weight:700; font-size: 16pt; font-family: Calibri; font-style: normal; text-decoration: underline; margin:5px 0;"><b>Authorization for a Repeating Electronic Funds Transfer</b></p>
+    <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:2px 0;">(Save time and postage. Avoid interest charges, late payments, and termination notices)</p>
     '''
     
     html += f'''
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:30px;">I, the undersigned, acknowledge that invoices prepared by Options for Senior America (Options) are due upon receipt, and therefore hereby authorize Options to withdraw any amounts owed by me on the same day as the invoice is prepared and emailed to me.   This funds withdrawal is made by initiating an electronic funds transfer, as a debit through ACH (Automated Clearing House) from my account at the financial institution (hereinafter "Bank") indicated below.  I also agree that, in the event the below mentioned care recipient passes away, I will not close this referenced bank account until I receive notification from Options that the final Options invoice is paid in full using the method of payment herein described.  Furthermore, I authorize Bank to accept and to debit entries indicated by Options from my account.</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:5px 0; line-height:1.3;">I, the undersigned, acknowledge that invoices prepared by Options for Senior America (Options) are due upon receipt, and therefore hereby authorize Options to withdraw any amounts owed by me on the same day as the invoice is prepared and emailed to me. This funds withdrawal is made by initiating an electronic funds transfer, as a debit through ACH (Automated Clearing House) from my account at the financial institution (hereinafter "Bank") indicated below. I also agree that, in the event the below mentioned care recipient passes away, I will not close this referenced bank account until I receive notification from Options that the final Options invoice is paid in full using the method of payment herein described. Furthermore, I authorize Bank to accept and to debit entries indicated by Options from my account.</p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;">This authorization is to remain in full force and effect until Options and Bank have received written notice from me of its termination in such time and in such manner as to afford Options and Bank reasonable opportunity to act on it.</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0; line-height:1.3;">This authorization is to remain in full force and effect until Options and Bank have received written notice from me of its termination in such time and in such manner as to afford Options and Bank reasonable opportunity to act on it.</p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:30px;padding-left:60px;">Care Recipient Name:&nbsp;&nbsp;<b>{care_title} {care_first} {care_last}</b></p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:8px 0 3px 30px;">Care Recipient Name:&nbsp;&nbsp;<b>{care_name}</b></p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Client Bank Account Signatory Name:&nbsp;&nbsp;<b>{clt_title} {clt_first} {clt_last}</b></p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Client Bank Account Signatory Name:&nbsp;&nbsp;<b>{clt_name}</b></p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Client Signature:&nbsp;&nbsp;_______________________________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Client Signature:&nbsp;&nbsp;_______________________________________</p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Date:&nbsp;&nbsp;<b>{datetime.now().strftime("%m/%d/%Y")}</b></p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 5px 30px;">Date:&nbsp;&nbsp;<b>{datetime.now().strftime("%m/%d/%Y")}</b></p>
     
-    <p style="font-weight:700; font-size: 14pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">&nbsp;&nbsp;***************************************************************************</p>
+    <p style="font-weight:700; font-size: 12pt; font-family: Calibri; font-style: normal; margin:5px 0 5px 30px;">&nbsp;&nbsp;****************************************************************</p>
     
-    <p style="font-weight:700; font-size: 14pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;text-decoration: underline;"><b>Account Information</b></p>
+    <p style="font-weight:700; font-size: 12pt; font-family: Calibri; font-style: normal; margin:5px 0 3px 30px; text-decoration: underline;"><b>Account Information</b></p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Bank Name, City, and State:&nbsp;&nbsp;______________________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Bank Name, City, and State:&nbsp;&nbsp;_____________________________</p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Routing Transit #:&nbsp;&nbsp;_______________________________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Routing Transit #:&nbsp;&nbsp;_________________________________</p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Account Number:&nbsp;&nbsp;_______________________________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Account Number:&nbsp;&nbsp;_________________________________</p>
     
-    <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:10px;padding-left:60px;">Account Type:&nbsp;&nbsp;<input type="checkbox">&nbsp;&nbsp; Checking &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox">&nbsp;&nbsp; Saving</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:5px 0 5px 30px; white-space: nowrap;">
+        <span style="font-weight:400;">Account Type:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <svg width="14" height="14" style="display: inline-block; vertical-align: middle;">
+            <rect x="1" y="1" width="12" height="12" style="fill:white; stroke:black; stroke-width:1;" />
+        </svg>
+        <span style="vertical-align: middle; margin: 0 20px 0 3px;">Checking</span>
+        <svg width="14" height="14" style="display: inline-block; vertical-align: middle;">
+            <rect x="1" y="1" width="12" height="12" style="fill:white; stroke:black; stroke-width:1;" />
+        </svg>
+        <span style="vertical-align: middle; margin-left: 3px;">Saving</span>
+    </p>
     
-    <div style="margin-top:10px; margin-left:60px; margin-right:60px; text-align: center; font-weight:400; font-size: 12pt; padding:100px; border: 4px double #000; border-width:4pt;"><b>----------Please Attach a Voided Check Here----------</b></div>
+    <div style="margin:10px 30px; text-align: center; font-weight:400; font-size: 10pt; padding:40px; border: 3px double #000;"><b>----------Please Attach a Voided Check Here----------</b></div>
     '''
     
     html += '</div>'

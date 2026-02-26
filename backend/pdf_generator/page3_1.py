@@ -14,79 +14,80 @@ def generate_page3_1(data):
     
     html = '<div>'
     
-    # Logo header
+    # Logo header - reduced margin
     html += f'''
-    <table width="100%" style="font-size:11.5px;margin-bottom:50px;">
+    <table width="100%" style="font-size:10px; margin-bottom:20px;">
         <tr>
-            <td style="padding-left:18px;">
-                <img style="width:2.0833in;height:0.9166in;" src="{logo_path}" />
+            <td style="padding-left:10px;">
+                <img style="width:2in;height:0.9in;" src="{logo_path}" />
             </td>
         </tr>
     </table>
     '''
     
-    # Title
+    # Title - reduced font sizes and margins
     html += '''
-    <p style="text-align: center; font-weight:700; font-size: 18pt; font-family: Calibri; font-style: normal; text-decoration: underline;"><b>Consumer Notice of Direct Care Worker Status</b></p>
-    <p style="text-align: center; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;">This form is to be completed by every consumer utilizing the <br> services of a Home Care Agency or Home Care Registry</p>
+    <p style="text-align: center; font-weight:700; font-size: 16pt; font-family: Calibri; font-style: normal; text-decoration: underline; margin:5px 0;"><b>Consumer Notice of Direct Care Worker Status</b></p>
+    <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:2px 0;">This form is to be completed by every consumer utilizing the <br> services of a Home Care Agency or Home Care Registry</p>
     '''
     
-    # First section - Name
+    # First section - Name - reduced spacing
     html += f'''
-    <table width="100%" style="font-size:11.5px;margin-top:30px;">
+    <table width="100%" style="font-size:10px; margin-top:15px;">
         <tr>
-            <td style="padding-left:18px;" width="1%">
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;">I,</p>
-                <p>&nbsp;&nbsp;</p>
+            <td style="padding-left:10px;" width="5%">
+                <p style="font-weight:400; font-size: 11pt; font-family: Calibri; margin:0;">I,</p>
             </td>
-            <td width="59%">
-                <p style="text-align: center; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;"><b>&nbsp; &nbsp; {clt_first} {clt_last}</b></p>
-                <p style="border-top:2px solid black; text-align: center; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (Print Name) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
+            <td width="55%">
+                <p style="text-align: center; font-weight:400; font-size: 11pt; font-family: Calibri; margin:0;"><b>{clt_first} {clt_last}</b></p>
+                <div style="border-top:1.5px solid black; width:90%; margin:2px auto;"></div>
+                <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; margin:1px 0;">(Print Name)</p>
             </td>
             <td width="40%">
-                <p style="text-align: left; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;padding-top:50px;"> understand that:</p>
-                <p>&nbsp;&nbsp;</p>
+                <p style="text-align: left; font-weight:400; font-size: 11pt; font-family: Calibri; margin:0; padding-top:5px;"> understand that:</p>
             </td>
         </tr>
     </table>
     '''
     
-    # Second section - Insurance information
+    # Second section - Insurance information - reduced spacing
     html += '''
-    <table width="100%" style="font-size:11.5px;margin-top:30px;">
+    <table width="100%" style="font-size:10px; margin-top:15px;">
         <tr>
-            <td style="padding-left:18px;" width="20%">
-                <p style="font-size:2px;">&nbsp;</p>
-                <p style="text-align: center; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal; border-top:2px solid black;"> &nbsp;&nbsp;&nbsp;&nbsp; Initials &nbsp;&nbsp;&nbsp;&nbsp;</p>
+            <td style="padding-left:10px;" width="15%">
+                <div style="border-top:1.5px solid black; width:80%; margin:0 auto;"></div>
+                <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; margin:1px 0;">Initials</p>
             </td>
-            <td style="padding-left:-17px;" width="80%">
-                <p style="text-align: center; font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;">I have been informed that Options For Senior America maintains general, professional liability, and workers compensation insurance covering the direct care worker who is employed by Options as an independent contractor.</p>                
+            <td style="padding-left:5px;" width="85%">
+                <p style="text-align: left; font-weight:400; font-size: 10pt; font-family: Calibri; margin:0; line-height:1.2;">I have been informed that Options For Senior America maintains general, professional liability, and workers compensation insurance covering the direct care worker who is employed by Options as an independent contractor.</p>                
             </td>
-        <tr>
+        </tr>
     </table>
     '''
     
-    # Signature section
+    # Signature section - reduced spacing
     html += f'''
-    <table width="100%" style="font-size:11.5px;margin-top:50px;">
+    <table width="100%" style="font-size:10px; margin-top:25px;">
         <tr>
-            <td align="center" width="70%">
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;"><b>&nbsp;</b></p><p style="font-size:2px;">&nbsp;</p>
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;border-top:2px solid black;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Signature of Consumer or Consumer\'s Representative &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
+            <td align="center" width="70%" style="padding-right:5px;">
+                <div style="border-top:1.5px solid black; width:80%; margin:0 auto;"></div>
+                <p style="font-weight:400; font-size: 10pt; font-family: Calibri; margin:2px 0;">Signature of Consumer or Consumer\'s Representative</p>
             </td>
-            <td align="center" width="30%">
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;"><b>&nbsp;</b></p><p style="font-size:2px;">&nbsp;</p>
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;border-top:2px solid black;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Date &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</p>
+            <td align="center" width="30%" style="padding-left:5px;">
+                <div style="border-top:1.5px solid black; width:80%; margin:0 auto;"></div>
+                <p style="font-weight:400; font-size: 10pt; font-family: Calibri; margin:2px 0;">Date</p>
             </td>
         </tr>
         <tr>
-            <td align="center" width="70%" style="padding-top:50px;">
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;"><b>{handled_by}</b></p><p style="font-size:2px;">&nbsp;</p>
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;border-top:2px solid black;">&nbsp; &nbsp; &nbsp; &nbsp; Signature of Representative of Options For Senior America  &nbsp; &nbsp; &nbsp; &nbsp;</p>
+            <td align="center" width="70%" style="padding-top:20px; padding-right:5px;">
+                <p style="font-weight:400; font-size: 11pt; font-family: Calibri; margin:0;"><b>{handled_by}</b></p>
+                <div style="border-top:1.5px solid black; width:80%; margin:5px auto 0;"></div>
+                <p style="font-weight:400; font-size: 10pt; font-family: Calibri; margin:2px 0;">Signature of Representative of Options For Senior America</p>
             </td>
-            <td align="center" width="30%" style="padding-top:50px;">
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;"><b> {datetime.now().strftime("%m/%d/%Y")} </b></p><p style="font-size:2px;">&nbsp;</p>
-                <p style="font-weight:400; font-size: 12pt; font-family: Calibri; font-style: normal;border-top:2px solid black;">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Date &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</p>
+            <td align="center" width="30%" style="padding-top:20px; padding-left:5px;">
+                <p style="font-weight:400; font-size: 11pt; font-family: Calibri; margin:0;"><b>{datetime.now().strftime("%m/%d/%Y")}</b></p>
+                <div style="border-top:1.5px solid black; width:80%; margin:5px auto 0;"></div>
+                <p style="font-weight:400; font-size: 10pt; font-family: Calibri; margin:2px 0;">Date</p>
             </td>
         </tr>
     </table>

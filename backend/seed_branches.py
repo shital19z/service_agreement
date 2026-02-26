@@ -4,6 +4,7 @@ import models
 from branch_config import BRANCH_DISPLAY_NAMES, get_branch_address
 import re
 
+
 def seed_branches():
     """Seed branches from config to database"""
     db = SessionLocal()

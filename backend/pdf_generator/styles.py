@@ -24,8 +24,29 @@ def get_styles(margins):
             font-size: 8pt; 
             line-height: 1.2; 
             color: #000000; 
+            margin: 0;
+            padding: 0;
         }}
         
+        /* Page container for proper footer positioning */
+        .page {{
+            position: relative;
+            min-height: 100vh;
+            page-break-inside: avoid;
+        }}
+        
+        /* Footer positioned at bottom right */
+        .page-footer {{
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 6pt;
+            color: #666666;
+            text-align: right;
+            padding: 5px;
+        }}
+        
+        /* Your existing styles below - keep them all */
         /* Baltimore Header Format */
         .office-info {{
             font-size: 8pt;
@@ -104,7 +125,7 @@ def get_styles(margins):
             margin-top: 4px;
         }}
         
-        /* Baltimore Footer with BA and date */
+        /* Baltimore Footer with BA and date - KEEP FOR BACKWARD COMPATIBILITY */
         .ba-footer {{
             width: 100%;
             margin-top: 20px;
@@ -130,7 +151,7 @@ def get_styles(margins):
             clear: both;
         }}
         
-        /* Baltimore List Format */
+        /* Baltimore List Format - FIXED VERSION */
         ol, ul {{ 
             padding-left: 25px; 
             margin-top: 5px; 
@@ -142,7 +163,44 @@ def get_styles(margins):
             font-size: 8pt;
         }}
         
-        /* Baltimore Nested Lists */
+        /* Main numbered lists */
+        ol.main-list {{
+            list-style-type: decimal;
+            padding-left: 26px;
+        }}
+        
+        /* Alphabetical sub-lists */
+        ol.alpha-list {{
+            list-style-type: lower-alpha;
+            padding-left: 24px;
+        }}
+        
+        /* Roman numeral sub-sub-lists */
+        ol.roman-list {{
+            list-style-type: lower-roman;
+            padding-left: 24px;
+        }}
+        
+        /* Ensure nested lists display properly */
+        ol.main-list li,
+        ol.alpha-list li,
+        ol.roman-list li {{
+            margin-bottom: 3px;
+        }}
+        
+        /* Fix for nested list items - important for PDF rendering */
+        li > ol {{
+            margin-top: 2px;
+            margin-bottom: 5px;
+        }}
+        
+        /* Force proper list numbering */
+        ol {{
+            display: block;
+            list-style-position: outside;
+        }}
+        
+        /* Baltimore Nested Lists - Legacy support */
         .nested-list {{
             padding-left: 40px;
             list-style-type: lower-alpha;
@@ -191,5 +249,6 @@ def get_styles(margins):
         .double-indent {{
             padding-left: 40px;
         }}
+        
     </style>
     """
