@@ -18,6 +18,14 @@ def get_styles(margins):
             margin-bottom: {margins['bottom']}in;
             margin-left: {margins['left']}in;
             margin-right: {margins['right']}in;
+
+            @frame footer_frame {{
+                -pdf-frame-content: footer_content;
+                left: {margins['left']}in;
+                width: {8.5 - margins['left'] - margins['right']}in;
+                top: {11 - margins['bottom'] - 0.5}in;
+                height: 0.5in;
+            }}
         }}
         body {{ 
             font-family: Helvetica, Arial, sans-serif; 

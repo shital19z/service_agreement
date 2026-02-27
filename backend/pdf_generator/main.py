@@ -22,6 +22,10 @@ def json_to_pdf(data_dict):
     # Extract data
     branch = data_dict.get('branch_code', '').lower()
     care_state = data_dict.get('care_state', '').upper()
+
+    def get_branch_specific_footer(branch_code : str) -> str:
+        print('branch_code[:2] --->' , branch_code[:2])
+        return branch_code[:2].upper()
     
     # Generate CSS styles - MATCHING SA - DC.pdf
     margins = {
@@ -84,29 +88,56 @@ def json_to_pdf(data_dict):
             <!-- Page 1: Service Agreement -->
             <div class="page">
                 {page1_html}
-                <div class="page-footer">{get_footer_tag(branch, care_state, 1)}</div>
+                <div id="footer_content" style="font-size:10px; color:#a29d96;">
+                <table width="100%">
+                    <tr>
+                        <td align="left">{get_branch_specific_footer(branch)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                    </tr>
+                </table>
+            </div>
             </div>
             
             <!-- Page 2: Continuation -->
             <div class="page-break"></div>
             <div class="page">
-                <div class="page-header">{get_header_tag(branch, care_state, 2)}</div>
                 {page1_cont_html}
-                <div class="page-footer">{get_footer_tag(branch, care_state, 2)}</div>
+                <div id="footer_content" style="font-size:10px; color:#a29d96;">
+                <table width="100%">
+                    <tr>
+                        <td align="left">{get_branch_specific_footer(branch)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                    </tr>
+                </table>
+            </div>
             </div>
             
             <!-- Page 3: Rights and Billing -->
             <div class="page-break"></div>
             <div class="page">
                 {page2_html}
-                <div class="page-footer">{get_footer_tag(branch, care_state, 3)}</div>
+                <div id="footer_content" style="font-size:10px; color:#a29d96;">
+                <table width="100%">
+                    <tr>
+                        <td align="left">{get_branch_specific_footer(branch)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                    </tr>
+                </table>
+            </div>
             </div>
             
             <!-- Page 4: EFT -->
             <div class="page-break"></div>
             <div class="page">
                 {page3_html}
-                <div class="page-footer">{get_footer_tag(branch, care_state, 4)}</div>
+                <div id="footer_content" style="font-size:10px; color:#a29d96;">
+                <table width="100%">
+                    <tr>
+                        <td align="left">{get_branch_specific_footer(branch)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                    </tr>
+                </table>
+            </div>
             </div>
     """
     
