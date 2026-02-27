@@ -3,7 +3,7 @@ import { AuthContext } from '../AuthContext';
 import BranchDropdown from "./BranchDropdown";
 import SignatureCanvas from 'react-signature-canvas';
 import '../Dashboard.css'; 
-import {endpoint} from '../resource/Constant;'
+import {endpoint} from '../resource/Constant';
 
 const Dashboard = () => {
     const { token, logout } = useContext(AuthContext);

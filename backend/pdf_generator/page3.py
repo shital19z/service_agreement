@@ -40,7 +40,7 @@ def generate_page3(data):
         display_clt_title = clt_title
         print(f"DEBUG - Same person detected, using client title '{clt_title}' for both")
     else:
-        # Different people, use各自的 titles
+   
         display_care_title = care_title
         display_clt_title = clt_title
     
@@ -96,18 +96,29 @@ def generate_page3(data):
     
     <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Routing Transit #:&nbsp;&nbsp;_________________________________</p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Account Number:&nbsp;&nbsp;_________________________________</p>
-    
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:5px 0 5px 30px; white-space: nowrap;">
-        <span style="font-weight:400;">Account Type:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <svg width="14" height="14" style="display: inline-block; vertical-align: middle;">
-            <rect x="1" y="1" width="12" height="12" style="fill:white; stroke:black; stroke-width:1;" />
-        </svg>
-        <span style="vertical-align: middle; margin: 0 20px 0 3px;">Checking</span>
-        <svg width="14" height="14" style="display: inline-block; vertical-align: middle;">
-            <rect x="1" y="1" width="12" height="12" style="fill:white; stroke:black; stroke-width:1;" />
-        </svg>
-        <span style="vertical-align: middle; margin-left: 3px;">Saving</span>
+    <!-- Account Type with square boxes in front - Using the same style as OPTIONS logo -->
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">
+        <table style="margin:0; padding:0; border-collapse: collapse;">
+            <tr>
+                <td style="font-weight:400; white-space: nowrap;">Account Type:&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td style="white-space: nowrap;">
+                    <table style="display: inline-table; margin-right: 20px; border-collapse: collapse;">
+                        <tr>
+                            <td style="border: 1px solid #000000; width: 12px; height: 12px; padding: 0; background-color: white;"></td>
+                            <td style="padding-left: 5px ; font-size:24pt;">Checking</td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="white-space: nowrap;">
+                    <table style="display: inline-table; border-collapse: collapse;">
+                        <tr>
+                            <td style="border: 1px solid #000000; width: 12px; height: 12px; padding: 0; background-color: white;"></td>
+                            <td style="padding-left: 5px; font-size:24pt">Saving</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
     </p>
     
     <div style="margin:10px 30px; text-align: center; font-weight:400; font-size: 10pt; padding:40px; border: 3px double #000;"><b>----------Please Attach a Voided Check Here----------</b></div>
