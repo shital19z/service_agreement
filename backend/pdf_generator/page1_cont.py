@@ -10,10 +10,10 @@ def generate_page1_cont(data):
     
     # Filter out any "BA" from string values in the data
     for key, value in clean_data.items():
-        if isinstance(value, str):
-            # Remove "BA" when it appears as a standalone header or prefix
-            clean_data[key] = value.replace('BA', '').replace('ba', '')
-    
+     if key == 'branch_code':  # Skip this one!
+        continue
+    if isinstance(value, str):
+        clean_data[key] = value.replace('BA', '').replace('ba', '')
     # Get values directly from cleaned data
     branch = clean_data.get('branch_code', '').lower()
     branch_data = clean_data.get('branch_data', {})
