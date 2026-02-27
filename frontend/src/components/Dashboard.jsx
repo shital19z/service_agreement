@@ -3,6 +3,7 @@ import { AuthContext } from '../AuthContext';
 import BranchDropdown from "./BranchDropdown";
 import SignatureCanvas from 'react-signature-canvas';
 import '../Dashboard.css'; 
+import {endpoint} from '../resource/Constant;'
 
 const Dashboard = () => {
     const { token, logout } = useContext(AuthContext);
@@ -51,7 +52,7 @@ const Dashboard = () => {
 
     const checkServerHealth = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/health');
+            const response = await fetch(`${endpoint}/health`);
             setServerOnline(response.ok);
         } catch (err) { setServerOnline(false); }
     };
@@ -59,7 +60,7 @@ const Dashboard = () => {
     const fetchData = async () => {
         if (!token) return;
         try {
-            const response = await fetch('http://127.0.0.1:8000/agreements', {
+            const response = await fetch(`${endpoint}/agreements`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.status === 401) { logout(); return; }
@@ -118,7 +119,7 @@ const handleBranchSelect = (branchData) => {
         console.log("FINAL DATA SENDING TO PYTHON:", submissionData);
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/agreements', {
+            const response = await fetch(`${endpoint}/agreements`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json', 
@@ -149,7 +150,7 @@ const handleBranchSelect = (branchData) => {
 
     const downloadPDF = async (id, recipientLast) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/agreements/${id}/pdf`, {
+            const response = await fetch(`${endpoint}/agreements/${id}/pdf`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             const blob = await response.blob();

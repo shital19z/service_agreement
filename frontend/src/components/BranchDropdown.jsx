@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { endpoint } from '../resource/Constant';
 
 const BranchDropdown = ({ onBranchChange, selectedValue }) => {
     const [branches, setBranches] = useState([]);
@@ -10,7 +11,7 @@ const BranchDropdown = ({ onBranchChange, selectedValue }) => {
             try {
                 setLoading(true);
                 // Added a timestamp to the URL to prevent browser caching (the 24 vs 70 issue)
-                const response = await fetch(`http://127.0.0.1:8000/branches?t=${new Date().getTime()}`);
+                const response = await fetch(`${endpoint}/branches?t=${new Date().getTime()}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

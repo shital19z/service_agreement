@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../AuthContext';
+import { endpoint } from '../resource/Constant';
 
 const Login = ({ switchToSignup, switchToForgotPassword }) => {
   const [username, setUsername] = useState('');
@@ -19,7 +20,7 @@ const Login = ({ switchToSignup, switchToForgotPassword }) => {
       formData.append('username', username.trim().toLowerCase());
       formData.append('password', password);
 
-      const response = await fetch('http://127.0.0.1:8000/login', {
+      const response = await fetch(`${endpoint}/login`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/x-www-form-urlencoded' 

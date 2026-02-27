@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { endpoint } from '../resource/Constant';
 
 const ForgotPassword = ({ switchToLogin }) => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ const ForgotPassword = ({ switchToLogin }) => {
     setMessage('');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/forgot-password', {
+      const response = await fetch(`${endpoint}/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
        body: JSON.stringify({ email: email.trim().toLowerCase() }),

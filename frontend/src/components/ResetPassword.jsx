@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { endpoint } from '../resource/Constant';
 
 const ResetPassword = ({ switchToLogin }) => {
   const [password, setPassword] = useState('');
@@ -39,7 +40,7 @@ const ResetPassword = ({ switchToLogin }) => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/reset-password', {
+      const response = await fetch(`${endpoint}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
