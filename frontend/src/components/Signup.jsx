@@ -113,9 +113,9 @@ const Signup = ({ switchToLogin }) => {
               disabled={loading}
               required
             >
-              <option value="" disabled>-- Select your role --</option>
-              <option value="Responsible Party">Responsible Party</option>
-              <option value="Care Recipient">Care Recipient</option>
+              {/* <option value="" disabled>-- Select your role --</option> */}
+              {/* <option value="Responsible Party">Responsible Party</option>
+              <option value="Care Recipient">Care Recipient</option> */}
               <option value="Agent">Agent</option>
             </select>
           </div>

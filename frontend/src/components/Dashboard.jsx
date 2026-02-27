@@ -16,32 +16,46 @@ const Dashboard = () => {
     const [showForm, setShowForm] = useState(false);
     const [serverOnline, setServerOnline] = useState(true);
     
+    // ✅ ADD THIS - branches state
+    const [branches, setBranches] = useState([]);
+    
     const [formData, setFormData] = useState({
-    clt_title: 'Mr.',
-    clt_first_name: '',
-    clt_last_name: '',
-    clt_address: '',
-    clt_city: '',
-    clt_state: 'MD',
-    clt_zip: '',
-    clt_relationship: '',
+        clt_title: 'Mr.',
+        clt_first_name: '',
+        clt_last_name: '',
+        clt_address: '',
+        clt_city: '',
+        clt_state: 'MD',
+        clt_zip: '',
+        clt_relationship: '',
 
-    care_title: 'Mrs.',
-    care_first_name: '', 
-    care_last_name: '',  
-    care_recipient_address: '',
-    care_city: '',
-    care_state: '',
-    care_zip: '',
+        care_title: 'Mrs.',
+        care_first_name: '', 
+        care_last_name: '',  
+        care_recipient_address: '',
+        care_city: '',
+        care_state: '',
+        care_zip: '',
 
-    branch_code: 'Select Branch',
-    initial_inquiry_date: '',
-    agreement_date: new Date().toISOString().split('T')[0],
-    start_date: '',
-    services_start_time: '',
-    care_type: '',
-    hourly_rate: '',
-});
+        branch_code: 'Select Branch',
+        initial_inquiry_date: '',
+        agreement_date: new Date().toISOString().split('T')[0],
+        start_date: '',
+        services_start_time: '',
+        care_type: '',
+        hourly_rate: '',
+    });
+
+    // ✅ MOVE THIS FUNCTION AFTER branches IS DEFINED
+    const getBranchDisplayName = (branchCode) => {
+        if (!branchCode || !branches.length) return branchCode;
+        
+        // Find the branch in the branches array
+        const branch = branches.find(b => b.branch_code === branchCode);
+        
+        // Return branch_name if found, otherwise return the original code
+        return branch ? branch.branch_name : branchCode;
+    };
 
     useEffect(() => {
         setFormData(prev => ({
@@ -57,6 +71,20 @@ const Dashboard = () => {
         } catch (err) { setServerOnline(false); }
     };
 
+    // ✅ ADD THIS - fetch branches from API
+    const fetchBranches = async () => {
+        try {
+            const response = await fetch(`${endpoint}/branches?t=${new Date().getTime()}`);
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Branches loaded in Dashboard:", data);
+                setBranches(data);
+            }
+        } catch (err) {
+            console.error("Error fetching branches:", err);
+        }
+    };
+
     const fetchData = async () => {
         if (!token) return;
         try {
@@ -70,8 +98,10 @@ const Dashboard = () => {
         finally { setLoading(false); }
     };
 
+    // ✅ UPDATE THIS - fetch branches when component mounts
     useEffect(() => { 
         fetchData();
+        fetchBranches(); // Add this line
         checkServerHealth();
     }, [token]);
 
@@ -83,19 +113,20 @@ const Dashboard = () => {
         }));
     };
 
-const handleBranchSelect = (branchData) => {
-    if (!branchData || !branchData.branch_code) {
-        console.warn("Branch selection received empty data.");
-        return;
-    }
+    const handleBranchSelect = (branchData) => {
+        if (!branchData || !branchData.branch_code) {
+            console.warn("Branch selection received empty data.");
+            return;
+        }
+        
+        console.log("Selected Branch Data:", branchData);
+        
+        setFormData(prev => ({ 
+            ...prev, 
+            branch_code: branchData.branch_code
+        }));
+    };
     
-    console.log("Selected Branch Data:", branchData);
-    
-    setFormData(prev => ({ 
-        ...prev, 
-        branch_code: branchData.branch_code
-    }));
-};
     const clearSignature = () => sigCanvas.current.clear();
 
     const handleCreateAgreement = async (e) => {
@@ -332,7 +363,8 @@ const handleBranchSelect = (branchData) => {
                                 {agreements.length > 0 ? agreements.map(ag => (
                                     <tr key={ag.id}>
                                         <td className="p-20"><strong>{ag.clt_first_name} {ag.clt_last_name}</strong></td>
-                                        <td className="p-20">{ag.branch_code}</td>
+                                        {/* ✅ NOW THIS WILL WORK */}
+                                        <td className="p-20">{getBranchDisplayName(ag.branch_code)}</td>
                                         <td className="p-20">${ag.hourly_rate}/hr</td>
                                         <td className="p-20">
                                             <button onClick={() => downloadPDF(ag.id, ag.clt_last_name)} className="action-btn small">Download PDF</button>
