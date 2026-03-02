@@ -144,7 +144,19 @@ class Agreement(Base):
     # Additional service details
     vehicle_authorized = Column(Boolean, default=False)  
     vehicle_authorization_initials = Column(String(10), nullable=True)
-    medication_administration = Column(Boolean, default=False)   
+    medication_administration = Column(Boolean, default=False)
+
+    # ===== ADDED MISSING FIELDS =====
+    # Date fields from Page 1
+    inicontactdate = Column(Date, nullable=True)        # Initial Contact Date (for GA/SC branches)
+    date_of_order = Column(Date, nullable=True)         # Order Date
+    
+    # Service details fields from Page 1
+    required_services = Column(Text, nullable=True)     # Required Services text
+    freq_of_visit = Column(Text, nullable=True)         # Frequency of Visits
+
+    hazards = Column(Text, nullable=True)               # Hazards text
+    perc_charged = Column(String(10), default="100")    # Percentage charged (e.g., "100")
 
     # SECTION 4: PAYMENT
     bank_name = Column(String, nullable=True)
@@ -164,8 +176,10 @@ class Agreement(Base):
     
     # Additional signature fields for multiple pages
     page1_signature = Column(Text, nullable=True)
+    page1_cont_signature = Column(Text, nullable=True)  # ADDED - Page 1 Continuation signature
     page2_signature = Column(Text, nullable=True)
     page3_signature = Column(Text, nullable=True)
+    page3_1_signature = Column(Text, nullable=True)     # ADDED - Page 3.1 Consumer Notice signature
 
     # OWNERSHIP
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)

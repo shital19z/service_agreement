@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../AuthContext'; 
 import BranchDropdown from "./BranchDropdown";
-import SignatureCanvas from 'react-signature-canvas';
 import '../Dashboard.css'; 
 import {endpoint} from '../resource/Constant';
 
 const Dashboard = () => {
     const { token, logout } = useContext(AuthContext);
-    const sigCanvas = useRef({}); 
     
     const [activeTab, setActiveTab] = useState('dashboard');
     const [agreements, setAgreements] = useState([]);
@@ -16,20 +14,20 @@ const Dashboard = () => {
     const [showForm, setShowForm] = useState(false);
     const [serverOnline, setServerOnline] = useState(true);
     
-    // ✅ ADD THIS - branches state
+    // branches state
     const [branches, setBranches] = useState([]);
     
     const [formData, setFormData] = useState({
-        clt_title: 'Mr.',
+        clt_title: '',
         clt_first_name: '',
         clt_last_name: '',
         clt_address: '',
         clt_city: '',
-        clt_state: 'MD',
+        clt_state: '',
         clt_zip: '',
         clt_relationship: '',
 
-        care_title: 'Mrs.',
+        care_title: '',
         care_first_name: '', 
         care_last_name: '',  
         care_recipient_address: '',
@@ -44,16 +42,20 @@ const Dashboard = () => {
         services_start_time: '',
         care_type: '',
         hourly_rate: '',
+        
+        // ===== ADDED NEW FIELDS =====
+        inicontactdate: '',
+        date_of_order: '',
+        required_services: '',
+        freq_of_visit: '',
+        
+        hazards: '',
+        perc_charged: '100',
     });
 
-    // ✅ MOVE THIS FUNCTION AFTER branches IS DEFINED
     const getBranchDisplayName = (branchCode) => {
         if (!branchCode || !branches.length) return branchCode;
-        
-        // Find the branch in the branches array
         const branch = branches.find(b => b.branch_code === branchCode);
-        
-        // Return branch_name if found, otherwise return the original code
         return branch ? branch.branch_name : branchCode;
     };
 
@@ -71,7 +73,6 @@ const Dashboard = () => {
         } catch (err) { setServerOnline(false); }
     };
 
-    // ✅ ADD THIS - fetch branches from API
     const fetchBranches = async () => {
         try {
             const response = await fetch(`${endpoint}/branches?t=${new Date().getTime()}`);
@@ -98,10 +99,9 @@ const Dashboard = () => {
         finally { setLoading(false); }
     };
 
-    // ✅ UPDATE THIS - fetch branches when component mounts
     useEffect(() => { 
         fetchData();
-        fetchBranches(); // Add this line
+        fetchBranches();
         checkServerHealth();
     }, [token]);
 
@@ -126,27 +126,32 @@ const Dashboard = () => {
             branch_code: branchData.branch_code
         }));
     };
-    
-    const clearSignature = () => sigCanvas.current.clear();
 
     const handleCreateAgreement = async (e) => {
         e.preventDefault();
-        if (sigCanvas.current.isEmpty()) return alert("Signature required");
         setIsGenerating(true);
 
-        const signatureImage = sigCanvas.current.getCanvas().toDataURL('image/png');
-
-        
         const submissionData = {
             ...formData,
             hourly_rate: parseFloat(formData.hourly_rate) || 0.0,
             mileage_rate: parseFloat(formData.mileage_rate) || 0.0,
-            client_signature: signatureImage,
+            
+            // New fields
+            inicontactdate: formData.inicontactdate || null,
+            date_of_order: formData.date_of_order || null,
+            required_services: formData.required_services || '',
+            freq_of_visit: formData.freq_of_visit || '',
+  
+            hazards: formData.hazards || '',
+            perc_charged: formData.perc_charged || '100',
+            
+            // No signature fields needed anymore
             rep_signature: formData.rep_signature || "Staff Signed",
             care_dob: formData.care_dob || null,
             start_date: formData.start_date || new Date().toISOString().split('T')[0],
             end_date: formData.end_date || null,
         };
+        
         console.log("FINAL DATA SENDING TO PYTHON:", submissionData);
 
         try {
@@ -280,7 +285,7 @@ const Dashboard = () => {
                                     </div>
                                 </div>
 
-                                {/* Section 3  */}
+                                {/* Section 3 - Office Administration */}
                                 <div className="section-divider">
                                     <span className="section-label">3. Office Administration & Schedule</span>
                                 </div>
@@ -290,6 +295,17 @@ const Dashboard = () => {
                                         <input type="date" name="initial_inquiry_date" className="form-input" value={formData.initial_inquiry_date} onChange={handleChange} />
                                     </div>
                                     <div className="form-group">
+                                        <label>Initial Contact Date (GA/SC only)</label>
+                                        <input type="date" name="inicontactdate" className="form-input" value={formData.inicontactdate} onChange={handleChange} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Order Date</label>
+                                        <input type="date" name="date_of_order" className="form-input" value={formData.date_of_order} onChange={handleChange} />
+                                    </div>
+                                </div>
+                                
+                                <div className="admin-row-grid">
+                                    <div className="form-group">
                                         <label>Instructions Given By</label>
                                         <input name="instructions_given_by" className="form-input" value={formData.instructions_given_by} onChange={handleChange} placeholder="Full Name" />
                                     </div>
@@ -297,35 +313,65 @@ const Dashboard = () => {
                                         <label>Services Start Time</label>
                                         <input name="services_start_time" className="form-input" value={formData.services_start_time} onChange={handleChange} placeholder="e.g. 12:00 PM" />
                                     </div>
-                                </div>
-
-                                {/* Section 3 - Row 2 */}
-                                <div className="admin-row-grid" style={{ marginTop: '20px' }}>
-                                    <div className="form-group">
-                                        <BranchDropdown onBranchChange={handleBranchSelect} selectedValue={formData.branch_code} />
-                                    </div>
                                     <div className="form-group">
                                         <label>Handled By (Staff)</label>
                                         <input name="handled_by" className="form-input" value={formData.handled_by} onChange={handleChange} required />
+                                    </div>
+                                </div>
+
+                                {/* Section 4 - Service Details */}
+                                <div className="section-divider">
+                                    <span className="section-label">4. Service Details</span>
+                                </div>
+                                <div className="admin-row-grid">
+                                    <div className="form-group">
+                                        <BranchDropdown onBranchChange={handleBranchSelect} selectedValue={formData.branch_code} />
                                     </div>
                                     <div className="form-group">
                                         <label>Hourly Rate ($)</label>
                                         <input name="hourly_rate" type="number" step="0.01" className="form-input" value={formData.hourly_rate} onChange={handleChange} />
                                     </div>
+                                    <div className="form-group">
+                                        <label>Percentage Charged (%)</label>
+                                        <input name="perc_charged" type="number" className="form-input" value={formData.perc_charged} onChange={handleChange} min="0" max="100" />
+                                    </div>
+                                </div>
+                                
+                                <div className="admin-row-grid">
+                                    <div className="form-group span-2">
+                                        <label>Required Services</label>
+                                        <textarea name="required_services" className="form-input" value={formData.required_services} onChange={handleChange} rows="3" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Frequency of Visits</label>
+                                        <input name="freq_of_visit" className="form-input" value={formData.freq_of_visit} onChange={handleChange} placeholder="e.g. Daily, Weekly" />
+                                    </div>
+                                </div>
+                                
+                                <div className="admin-row-grid">
+                                    
+                                    <div className="form-group span-2">
+                                        <label>Hazards</label>
+                                        <textarea name="hazards" className="form-input" value={formData.hazards} onChange={handleChange} rows="2" placeholder="None Reported" />
+                                    </div>
+                                </div>
+                                
+                                <div className="admin-row-grid">
+                                    <div className="form-group">
+                                        <label>Care Type</label>
+                                        <input name="care_type" className="form-input" value={formData.care_type} onChange={handleChange} placeholder="Home Care" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Start Date</label>
+                                        <input type="date" name="start_date" className="form-input" value={formData.start_date} onChange={handleChange} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>End Date</label>
+                                        <input type="date" name="end_date" className="form-input" value={formData.end_date} onChange={handleChange} />
+                                    </div>
                                 </div>
 
-                                {/* Signature Section */}
-                                <div className="signature-section-container">
-                                    <label className="sig-label">Authorized Client Signature</label>
-                                    <div className="signature-canvas-wrapper">
-                                        <SignatureCanvas 
-                                            ref={sigCanvas}
-                                            penColor='#1e3a8a'
-                                            canvasProps={{ className: 'sigCanvas_element' }} 
-                                        />
-                                    </div>
-                                    <button type="button" onClick={clearSignature} className="clear-sig-btn">Clear Signature</button>
-                                </div>
+                                {/* SIGNATURE SECTIONS REMOVED */}
 
                                 <div className="form-actions-row">
                                     <button type="submit" className="action-btn submit-flex" disabled={isGenerating}>
@@ -363,7 +409,6 @@ const Dashboard = () => {
                                 {agreements.length > 0 ? agreements.map(ag => (
                                     <tr key={ag.id}>
                                         <td className="p-20"><strong>{ag.clt_first_name} {ag.clt_last_name}</strong></td>
-                                        {/* ✅ NOW THIS WILL WORK */}
                                         <td className="p-20">{getBranchDisplayName(ag.branch_code)}</td>
                                         <td className="p-20">${ag.hourly_rate}/hr</td>
                                         <td className="p-20">

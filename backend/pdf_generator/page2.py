@@ -24,9 +24,9 @@ def generate_page2(data):
     # Get current date for signature
     current_date = datetime.now().strftime("%m/%d/%Y")
     
-    html = '<div><div style="font-size:7px;margin-top:0;line-height:1.1;">'  # Reduced to 7px, removed top margin
+    html = '<div><div style="font-size:7px;margin-top:0;line-height:1.1;">'  # Keeping your font size
     
-    # MARYLAND & NEW JERSEY BRANCHES
+    # ===== MARYLAND & NEW JERSEY BRANCHES =====
     md_nj_branches = [
         'anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
         'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
@@ -105,7 +105,7 @@ def generate_page2(data):
         
         html += '</ol>'
     
-    # GEORGIA BRANCHES
+    # ===== GEORGIA BRANCHES =====
     elif branch in ['athomecare', 'athomecare_staging', 'scgahomecare', 'scgahomecare_staging']:
         html += '''
         <p style="font-size:9px;text-align:center;margin:0;"><b><u>NOTICE OF RIGHTS AND RESPONSIBILITIES</u></b></p>
@@ -126,7 +126,7 @@ def generate_page2(data):
         </ol>
         '''
     
-    # CLEVELAND/DC/OTHER BRANCHES
+    # ===== CLEVELAND/DC/OTHER BRANCHES =====
     elif branch in ['clhomecare', 'clhomecare_staging', 'blmdhomecare', 'blmdhomecare_staging', 
                     'ciohhomecare', 'ciohhomecare_staging', 'chazhomecare', 'chazhomecare_staging',
                     'shmihomecare', 'shmihomecare_staging']:
@@ -160,7 +160,7 @@ def generate_page2(data):
         </ol>
         '''
     
-    # VIRGINIA BRANCHES
+    # ===== VIRGINIA BRANCHES =====
     elif branch in ['nvahomecare', 'nvahomecare_staging', 'nvahomecarearchive', 'nvahomecarearchive_staging',
                     'rihomecare', 'rihomecare_staging', 'mnhomecare', 'mnhomecare_staging',
                     'lovahomecare', 'lovahomecare_staging', 'sfvahomecare', 'sfvahomecare_staging',
@@ -197,7 +197,7 @@ def generate_page2(data):
         </ol>
         '''
     
-    # FLORIDA BRANCHES
+    # ===== FLORIDA BRANCHES =====
     elif branch in ['tahomecare', 'tahomecare_staging', 'woflhomecare', 'woflhomecare_staging', 
                     'lzflhomecare', 'lzflhomecare_staging', 'wpbflhomecare', 'wpbflhomecare_staging']:
         html += '''
@@ -217,7 +217,202 @@ def generate_page2(data):
         </ol>
         '''
     
-    # Add Notice of Billing Procedures for all branches
+    # ===== NORTH CAROLINA BRANCHES (gbhomecare, rdhomecare) - ADDED =====
+    elif branch in ['gbhomecare', 'gbhomecare_staging', 'rdhomecare', 'rdhomecare_staging']:
+        # Set complaint phone based on branch
+        if branch in ['gbhomecare', 'gbhomecare_staging']:
+            complaint_phone = "336.270.6647"
+        else:
+            complaint_phone = "919.380.6812"
+        
+        html += f'''
+        <p style="font-size:9px;text-align:center;margin:0;"><b><u>Notice of Patients’ Rights Responsibilities</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;">YOU ARE A VALUED CUSTOMER, AND YOU HAVE THE FOLLOWING RIGHTS AND RESPONSIBILITIES:</p>
+        <ol type="1" style="padding-left: 16px;margin:0">
+            <li style="margin-bottom:0;">Right to participate in the planning of the client\'s home care, including the right to accept or refuse services.</li>
+            <li style="margin-bottom:0;">Right to be fully informed of the charges of the services.</li>
+            <li style="margin-bottom:0;">Right to be fully informed of the name, business telephone number and business address of the person supervising the service and how to contact that person.</li>
+            <li style="margin-bottom:0;">Right to be informed of the complaint procedures and the right to submit complaints without fear of discrimination or retaliation and to have them investigated by the provider within a reasonable period of time.</li>
+            <li style="margin-bottom:0;">Right of confidentiality of patient records.</li>
+            <li style="margin-bottom:0;">Right to have your property and residence treated with respect.</li>
+            <li style="margin-bottom:0;">Right of nondiscrimination in obtaining services from Options because of race, color, religion, creed, national origin, ancestry, disability, sex, or age.</li>
+            <li style="margin-bottom:0;">Responsibility to advise the provider of any changes in your condition or any events that affect your service needs.</li>
+            <li style="margin-bottom:0;">Responsibility to treat the OPTIONS\' caregivers with respect.</li>
+        </ol>
+        <p style="font-size:7px;text-align:center;margin:3px 0;"><b><u>Notice of Complaint Procedures</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;">ANY COMPLAINT YOU MAY HAVE WILL BE TREATED EXPEDITIOUSLY AS FOLLOWS:</p>
+        <ol type="1" style="padding-left: 16px;margin:0">
+            <li style="margin-bottom:0;">Please be advised that at OPTIONS, the person responsible for complaints intake and acknowledgement of complaints is the Community Relations Manager. Their telephone number is {complaint_phone}.</li>
+            <li style="margin-bottom:0;">OPTIONS has in place a system for logging receipt of complaints, investigation, and resolution of complaints.</li>
+            <li style="margin-bottom:0;">The OPTIONS employee who will be responsible for investigating complaints is the Community Relations Manager.</li>
+            <li style="margin-bottom:0;">OPTIONS will produce a written record of the findings of each complaint investigated.</li>
+            <li style="margin-bottom:0;">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Director.</li>
+            <li style="margin-bottom:0;">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient’s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>
+            <li style="margin-bottom:0;">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>
+            <li style="margin-bottom:0;">You may also contact the North Carolina Division of Health Service Regulation, complaints hotline, at 800.624.3004.</li>
+        </ol>
+        '''
+    
+    # ===== PENNSYLVANIA BRANCHES (hbhomecare, nspahomecare) - ADDED =====
+    elif branch in ['hbhomecare', 'hbhomecare_staging', 'nspahomecare', 'nspahomecare_staging']:
+        
+        if branch in ['hbhomecare', 'hbhomecare_staging']:
+            complaint_phone = "717-510-8613"
+            address = "6 Montgomery Village Avenue, Suite 330, Gaithersburg, MD 20879"
+        else:  # nspahomecare
+            complaint_phone = "610.975.4422"
+            address = "175 Strafford Avenue, Suite One Wayne, PA 19087"
+        
+        html += f'''
+        <p style="font-size:9px;text-align:center;margin:0;"><b><u>Notice of Patients’ Rights and Responsibilities</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;padding-left:10px;">YOU ARE A VALUED CUSTOMER, AND YOU HAVE THE FOLLOWING RIGHTS AND RESPONSIBILITIES:</p>
+        <ol type="1" style="padding-left: 16px;margin:0">
+            <li style="margin-bottom:0;">Right to participate in the planning of the client\'s home care, including the right to accept or refuse services.</li>
+            <li style="margin-bottom:0;">Right to be fully informed of the charges of the services.</li>
+            <li style="margin-bottom:0;">Right to be fully informed of the name, business telephone number and business address of the person supervising the service and how to contact that person.</li>
+            <li style="margin-bottom:0;">Right to be informed of the complaint procedures and the right to submit complaints without fear of discrimination or retaliation and to have them investigated by the provider within a reasonable period of time.</li>
+            <li style="margin-bottom:0;">Right of confidentiality of patient records.</li>
+            <li style="margin-bottom:0;">Right to have your property and residence treated with respect.</li>
+            <li style="margin-bottom:0;">Right of nondiscrimination in obtaining services from Options because of race, color, religion, creed, national origin, ancestry, disability, sex, or age.</li>
+            <li style="margin-bottom:0;">Responsibility to advise the provider of any changes in your condition or any events that affect your service needs.</li>
+            <li style="margin-bottom:0;">Responsibility to treat the OPTIONS\' caregivers with respect.</li>
+        </ol>
+        <p style="font-size:7px;text-align:center;margin:3px 0;margin-top:5px;"><b><u>Notice of Complaint Procedures</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;padding-left:10px;">ANY COMPLAINT YOU MAY HAVE WILL BE TREATED EXPEDITIOUSLY AS FOLLOWS:</p>
+        <ol type="1" style="padding-left: 16px;margin:0">
+            <li style="margin-bottom:0;">Please be advised that at OPTIONS, the person responsible for complaints intake and acknowledgement of complaints is the Community Relations Manager. Their telephone number is {complaint_phone}.</li>
+            <li style="margin-bottom:0;">OPTIONS has in place a system for logging receipt of complaints, investigation, and resolution of complaints.</li>
+            <li style="margin-bottom:0;">The OPTIONS employee who will be responsible for investigating complaints is the Community Relations Manager.</li>
+            <li style="margin-bottom:0;">OPTIONS will produce a written record of the findings of each complaint investigated.</li>
+            <li style="margin-bottom:0;">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Manager.</li>
+            <li style="margin-bottom:0;">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient’s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>
+            <li style="margin-bottom:0;">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>
+            <li style="margin-bottom:0;">If you are not satisfied with the proposed resolution, you may appeal to Options Corporate office at 1-800-2-OPTIONS, or in writing to OPTIONS, {address}, in which case your complaint would be reviewed and Options will get back to you in writing within 21 days of receipt of the appeal. You may also contact the Pennsylvania Department of Health\'s complaint hotline at 1-800-254-5164 and/or the Ombudsman Program at 717-780-6130 which is located at the Dauphin County Area Agency on Aging (AAA) office.</li>
+        </ol>
+        '''
+    
+    # ===== INDIANA BRANCHES (lkinhomecare) - ADDED =====
+    elif branch in ['lkinhomecare', 'lkinhomecare_staging']:
+        html += '''
+        <p style="font-size:9px;text-align:center;margin:0;"><b><u>Notice of Client\'s Rights and Responsibilities</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;padding-left: 10px;">YOU ARE A VALUED CUSTOMER, AND YOU HAVE THE RIGHT TO:</p>
+        <ol type="1" style="padding-left: 16px;margin:0">
+            <li style="margin-bottom:0;">Have your property treated with respect.</li>
+            <li style="margin-bottom:0;">Temporarily suspend, permanently terminate, temporarily add, or permanently add services in the service plan.</li>
+            <li style="margin-bottom:0;">File grievances regarding services furnished or regarding the lack of respect for property by the personal services agency, and is not subject to discrimination or reprisal for filing a grievance.</li>
+            <li style="margin-bottom:0;">Be free from verbal, physical, and psychological abuse and to be treated with dignity. Furthermore, as part of the client rights and responsibilities, it is understood that:</li>
+            <li style="margin-bottom:0;">It is not within the scope of the personal services agency\'s license to manage the medical and health conditions of the client if a condition becomes unstable or unpredictable.</li>
+            <li style="margin-bottom:0;">The client is made aware of charges for services provided by the personal services agency.</li>
+            <li style="margin-bottom:0;">The personal services agency\'s policy for notifying the client of any increase in the cost of services is included below, under "Notice of Billing Procedures".</li>
+            <li style="margin-bottom:0;">The hours the personal services agency\'s office is open for business are made known to the client.</li>
+            <li style="margin-bottom:0;">Upon request by the client, the personal service agency will make available to the client a written list of the names and addresses of all persons having at least a five percent (5%) ownership or controlling interest in the personal services agency.</li>
+            <li style="margin-bottom:0;">The procedures for contacting the personal services agency\'s manager, or the manager\'s designee, while the personal services agency\'s office is open or closed, are made known to the client.</li>
+            <li style="margin-bottom:0;">The procedure and telephone number to call to file a complaint with the personal services agency are indicated below under "Notice of Complaint Procedures".</li>
+            <li style="margin-bottom:0;">That the state department does not inspect personal services agencies as a part of the licensing process but does investigate complaints concerning personal services agencies.</li>
+            <li style="margin-bottom:0;">The procedure and telephone number to call to file a complaint with the state department along with the business hours of the state department are included below in the "Notice of Complaint Procedures" section.</li>
+        </ol>
+        <p style="font-size:7px;text-align:center;margin:3px 0;margin-top:5px;"><b><u>Notice of Complaint Procedures</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;padding-left: 10px;">ANY COMPLAINT YOU MAY HAVE WILL BE TREATED EXPEDITIOUSLY AS FOLLOWS:</p>
+        <ol type="1" style="padding-left: 16px;margin:0">
+            <li style="margin-bottom:0;">Please be advised that at OPTIONS, the person responsible for complaints intake and acknowledgement of complaints is the Office Manager or the Franchise Owner. Their office number is 219.321.9130.</li>
+            <li style="margin-bottom:0;">OPTIONS has in place a system for logging receipt of complaints, investigation, and resolution of complaints.</li>
+            <li style="margin-bottom:0;">The OPTIONS employee who will be responsible for investigating complaints is the Franchise Owner or the Office Manager.</li>
+            <li style="margin-bottom:0;">OPTIONS will produce a written record of the findings of each complaint investigated.</li>
+            <li style="margin-bottom:0;">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Franchise Owner or the Office Manager.</li>
+            <li style="margin-bottom:0;">The local social service department Adult Protective Services unit will be informed if, at any stage of investigating or resolving a complaint, the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient’s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>
+            <li style="margin-bottom:0;">The Franchise Owner or the Office Manager is the agency employee who will, within 5 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>
+            <li style="margin-bottom:0;">If you are not satisfied with the proposed resolution, you may appeal to an agency Director at 219.321.9130, or in writing to OPTIONS Director, 8488 Georgia Street, Suite D, Merrillville, IN 46410, in which case they would review the case and get back to you in writing within 5 business days of receipt of the appeal. You may also contact the Consumer Protection Division Complaint Hotline at 1-800-382-5516, the Indiana Department of Aging at 1-888-673-0002, or the Indiana State Department for Health at 317-233-1325 between 8:15AM and 4:45PM Monday through Friday.</li>
+        </ol>
+        '''
+    
+    # ===== DC BRANCHES with STATE-SPECIFIC LOGIC - ADDED =====
+    elif branch in ['dchomecare', 'dchomecare_staging']:
+        if care_state == "DC":
+            html += '''
+            <p style="font-size:9px;text-align:center;margin:0;"><b><u>Notice of Patients’ Rights and Responsibilities</u></b></p>
+            <p style="font-size:7px;margin:0;">YOU ARE A VALUED CUSTOMER, AND YOU HAVE THE FOLLOWING RIGHTS AND RESPONSIBILITIES:</p>
+            <ol type="1" style="padding-left: 16px;margin:0">
+                <li style="margin-bottom:0;">Right to accept or refuse services.</li>
+                <li style="margin-bottom:0;">Right to be fully informed of the charges of the services.</li>
+                <li style="margin-bottom:0;">Right to be fully informed of the name, business telephone number and business address of the person supervising the service and how to contact that person.</li>
+                <li style="margin-bottom:0;">Right to be informed of the complaint procedures and the right to submit complaints without fear of discrimination or retaliation and to have them investigated by the provider within a reasonable period of time.</li>
+                <li style="margin-bottom:0;">Right of confidentiality of patient records.</li>
+                <li style="margin-bottom:0;">Right to have your property and residence treated with respect.</li>
+                <li style="margin-bottom:0;">Responsibility to advise the provider of any changes in your condition or any events that affect your service needs.</li>
+                <li style="margin-bottom:0;">Responsibility to treat the OPTIONS’ caregivers with respect.</li>
+                <li style="margin-bottom:0;">For further assistance, you may call and speak with an OPTIONS manager at 301.562.1100 or 800.267.8466</li>                
+            </ol>
+            <p style="font-size:7px;text-align:center;margin:3px 0;margin-top:5px;"><b><u>Notice of Complaint Procedures</u></b></p>
+            <p style="font-size:7px;margin:0;">ANY COMPLAINT YOU MAY HAVE WILL BE TREATED EXPEDITIOUSLY AS FOLLOWS:</p>
+            <ol type="1" style="padding-left: 16px;margin:0">
+                <li style="margin-bottom:0;">Please be advised that at OPTIONS, the person responsible for complaints intake and acknowledgement of complaints is the Community Relations Manager. Their office number is 202.581.2000 for the District of Columbia, 301.562.3100 for Montgomery Co., MD and P.G. County, MD</li>
+                <li style="margin-bottom:0;">OPTIONS has in place a system for logging receipt of complaints, investigation, and resolution of complaints.</li>
+                <li style="margin-bottom:0;">The OPTIONS employee who will be responsible for investigating complaints is the Community Relations Manager or the Care Manager.</li>
+                <li style="margin-bottom:0;">OPTIONS will produce a written record of the findings of each complaint investigated.</li>
+                <li style="margin-bottom:0;">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Manager.</li>
+                <li style="margin-bottom:0;">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient’s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>
+                <li style="margin-bottom:0;">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>
+                <li style="margin-bottom:0;">If you are not satisfied with the proposed resolution, you may appeal to an agency Director at 1-800-2-OPTIONS, or in writing to OPTIONS Director, 6 Montgomery Village Avenue, Suite 330, Gaithersburg, MD 20879, in which case they would review the case and get back to you in writing within 21 days of receipt of the appeal.</li>
+            </ol>
+            '''
+        else:
+            top_margin = "0px"
+            html += f'''
+            <p style="font-size:9px;text-align:center;margin:0;"><b><u>Notice of Patients’ Rights and Responsibilities</u></b></p>
+            <ol class="main-list" style="padding-left: 16px; margin:0; list-style-type: decimal;">
+                <li style="margin-bottom: 0;">A client, or the client representative with legal authority to make health care decisions, has the right to:
+                    <ol class="alpha-list" style="padding-left: 14px; margin:0; list-style-type: lower-alpha;">
+                        <li style="margin-bottom:0;">Be treated with consideration, respect, and full recognition of the client’s human dignity and individuality</li>
+                        <li style="margin-bottom:0;">Receive treatment, care, and services that are adequate, appropriate, and in compliance with relevant State, local, and federal laws and regulations</li>
+                        <li style="margin-bottom:0;">Participate in the development of the client’s care plan and medical treatment</li>
+                        <li style="margin-bottom:0;">Refuse treatment after the possible consequences of refusing treatment have been fully explained</li>
+                        <li style="margin-bottom:0;">Privacy</li>
+                        <li style="margin-bottom:0;">Be free from mental, verbal, sexual, and physical abuse, neglect, involuntary seclusion, and exploitation</li>
+                        <li style="margin-bottom:0;">Confidentiality</li>
+                    </ol>
+                </li>
+                <li style="margin-bottom: 0;">A client or client representative has the right to:
+                    <ol class="alpha-list" style="padding-left: 14px; margin:0; list-style-type: lower-alpha;">
+                        <li style="margin-bottom:0;">Make suggestions or complaints, or present grievances on behalf of the client to the agency, government agencies, or other persons without the threat or fear of retaliation</li>
+                        <li style="margin-bottom:0;">Receive a prompt response, through an established complaint or grievance procedure, to any complaints, suggestions, or grievances the participant may have</li>
+                        <li style="margin-bottom:0;">Have access to the procedures for making a complaint to the Office of Health Care Quality - see (3) below, and to:
+                            <ol class="roman-list" style="padding-left: 14px; margin:0; list-style-type: lower-roman;">
+                                <li style="margin-bottom:0;">The Adult Protective Services Program of the local department of social services, if the client is an adult; or</li>
+                                <li style="margin-bottom:0;">The Child Protective Services Program of the local department of social services, if the client is a minor</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+                <li style="margin-bottom: 0;">A client or client representative has the responsibility to:
+                    <ol class="alpha-list" style="padding-left: 14px; margin:0; list-style-type: lower-alpha;">
+                        <li style="margin-bottom:0;">Advise the Options office of any changes in the care recipient’s condition, or of any events that affect the care recipient’s service needs.</li>
+                        <li style="margin-bottom:0;">Treat the Options caregivers with respect.</li>
+                        <li style="margin-bottom:0;">Pay Options invoices in a timely manner as indicated below under the “Notice of Billing Procedures” section.</li>
+                    </ol>
+                </li>
+            </ol>
+
+            <p style="font-size:9px;text-align:center;margin:0;margin-top:{top_margin};"><b><u>Notice of Complaint Procedures</u></b></p>
+            <ol class="main-list" style="padding-left: 16px; margin:0; list-style-type: decimal;">
+                <li style="margin-bottom:0;">Please be advised that at OPTIONS, the person responsible for complaints intake and acknowledgement of complaints is the Community Relations Manager. Their office number is 410.224.2700 for Annapolis, 410.448.1100 for Baltimore, 410.893.9914 for Bel Air, 301.562.3100 for Bethesda, 301.624.5630 for Frederick, and 301.392.1387 for La Plata</li>
+                <li style="margin-bottom:0;">OPTIONS has in place a system for logging receipt of complaints, investigation, and resolution of complaints.</li>
+                <li style="margin-bottom:0;">The OPTIONS employee who will be responsible for investigating complaints is the Community Relations Manager or the Care Manager.</li>
+                <li style="margin-bottom:0;">OPTIONS will produce a written record of the findings of each complaint investigated.</li>
+                <li style="margin-bottom:0;">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Manager.</li>
+                <li style="margin-bottom:0;">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient’s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>
+                <li style="margin-bottom:0;">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>
+                <li style="margin-bottom:0;">If you are not satisfied with the proposed resolution, you may appeal to an agency Director at 1-800-2-OPTIONS, or in writing to OPTIONS Director, 555 Quince Orchard Road, Suite 240, Gaithersburg, MD 20878, in which case they would review the case and get back to you in writing within 21 days of receipt of the appeal. You may also write to Barbara Fagan, Survey Coordinator, Office of Health Care Quality, Bland Bryant Building, Spring Grove Hospital Center, 55 Wade Avenue, Catonsville, MD 21228, or you may call the State of Maryland’s Residential Service Agency Hotline at 1-877-4MD-DHMH.</li>
+            </ol>
+            '''
+    
+    # ===== DEFAULT to MD/NJ template if no match (shouldn't happen) =====
+    else:
+        html += '''
+        <p style="font-size:7px;text-align:center;margin:0;"><b><u>Notice of Patients’ Rights and Responsibilities</u></b></p>
+        <p style="font-size:7px;text-align:left;margin:0;">Default template - please contact administrator.</p>
+        '''
+    
+    # ===== NOTICE OF BILLING PROCEDURES (for ALL branches) =====
     html += f'''
     <p style="font-size:9px;text-align:center;margin:0;"><b><u>Notice of Billing Procedures</u></b></p>
     <p style="font-size:7px;margin:0;">BILLING, BILLING ERRORS AND REFUNDS ARE TREATED AS FOLLOWS:</p>
@@ -231,7 +426,7 @@ def generate_page2(data):
     </div>
     '''
     
-    # Signature section - with page break protection, no top margin
+    # ===== SIGNATURE SECTION =====
     html += '<div style="page-break-inside: avoid; margin-top: 0;">'
     
     if branch in ['athomecare', 'athomecare_staging', 'scgahomecare', 'scgahomecare_staging']:

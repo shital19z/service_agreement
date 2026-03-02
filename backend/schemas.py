@@ -33,11 +33,9 @@ class AgreementBase(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     
-    
     initial_inquiry_date: Optional[date] = None
     services_start_time: Optional[str] = None
     instructions_given_by: Optional[str] = None
-  
 
     hours_requested: Optional[str] = None 
     frequency_duration: Optional[str] = None
@@ -50,6 +48,17 @@ class AgreementBase(BaseModel):
     vehicle_authorized: bool = False
     vehicle_authorization_initials: Optional[str] = None
     medication_administration: bool = False
+
+    # ===== ADDED MISSING FIELDS =====
+    inicontactdate: Optional[date] = None
+    date_of_order: Optional[date] = None
+    required_services: Optional[str] = None
+    freq_of_visit: Optional[str] = None
+  
+    hazards: Optional[str] = None
+    perc_charged: Optional[str] = "100"
+    page1_cont_signature: Optional[str] = None
+    page3_1_signature: Optional[str] = None
 
     # PAYMENT
     bank_name: Optional[str] = None
@@ -89,7 +98,6 @@ class BranchBase(BaseModel):
     fax: Optional[str] = None
     mobile: Optional[str] = None
     is_corporate: bool = False
-   
 
     class Config:
         from_attributes = True

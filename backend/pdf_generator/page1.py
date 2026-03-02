@@ -2,6 +2,18 @@
 from datetime import datetime
 from config import Config  
 
+def format_address(city, state, zip_code):
+    """Format address components only if they have values"""
+    parts = []
+    if city and city.strip():
+        parts.append(city.strip())
+    if state and state.strip():
+        parts.append(state.strip())
+    if zip_code and zip_code.strip():
+        parts.append(zip_code.strip())
+    
+    return ', '.join(parts) if parts else ''
+
 def generate_page1(data):
     """
     Generate Page 1 HTML - Complete with all PHP logic
@@ -62,9 +74,10 @@ def generate_page1(data):
     start_time = data.get('services_start_time', '12:00 pm')
     instructions_by = data.get('instructions_given_by', f"{clt_first} {clt_last}")
     
-    # Service fields
+    # Service fields - UPDATED to include required_services
     care_type = data.get('care_type', '')
-    frequency = data.get('frequency_duration', '')
+    required_services = data.get('required_services', '')  # ADDED
+    frequency = data.get('freq_of_visit', '') or data.get('frequency_duration', '')
     hourly_rate = float(data.get('hourly_rate', 0))
     hazards = data.get('hazards', '')
     
@@ -100,9 +113,15 @@ def generate_page1(data):
     
     care_name = ' '.join(care_name_parts) if care_name_parts else "Not Provided"
     
-    care_full_address = f"{care_address}, {care_city}, {care_state} {care_zip}".strip(', ')
-    if not care_full_address or care_full_address == ', ,  ':
-        care_full_address = "Not Provided"
+    # Format care full address with conditional components
+    care_full_address_parts = []
+    if care_address and care_address.strip():
+        care_full_address_parts.append(care_address.strip())
+    city_state_zip = format_address(care_city, care_state, care_zip)
+    if city_state_zip:
+        care_full_address_parts.append(city_state_zip)
+    
+    care_full_address = ', '.join(care_full_address_parts) if care_full_address_parts else "Not Provided"
     
     # Build the HTML with REDUCED SPACING
     html = f'''
@@ -129,6 +148,7 @@ def generate_page1(data):
                         <b>
                         {data.get('clt_title', '')} {data.get('clt_first_name', '')} {data.get('clt_last_name', '')}<br>
                         {data.get('clt_address', '')}<br>
+                        {format_address(clt_city, clt_state, clt_zip)}
                         </b>               
                     </p>
                 </td>
@@ -200,9 +220,9 @@ def generate_page1(data):
         </table>
         '''
     
-    # Required Services
+    # Required Services - UPDATED to use required_services field
     blank_div = '<div style="height:5px"> &nbsp; </div>'
-    req_services = care_type or blank_div
+    req_services = required_services or care_type or blank_div  # UPDATED
     
     html += f'''
         <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">

@@ -7,6 +7,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 import secrets
 import os
+import re  
 from email_config import send_reset_email
 
 # ADD THIS IMPORT
@@ -19,10 +20,75 @@ from pydantic import BaseModel
 import models
 import schemas
 import auth
-from database import engine, get_db
+from database import engine, get_db, SessionLocal  # Add SessionLocal here
 from auth import get_current_user, authenticate_user, create_access_token
 from pdf_generator import json_to_pdf
 from branch_config import get_branch_options, get_branch_config, BRANCH_DISPLAY_NAMES, get_branch_address
+
+# ===== AUTO-SEED FUNCTION =====
+def ensure_branches_exist():
+    """Automatically seed branches if none exist"""
+    db = SessionLocal()
+    try:
+        # Check if branches exist
+        existing_count = db.query(models.Branch).count()
+        print(f"Database check: {existing_count} branches found")
+        
+        if existing_count == 0:
+            print("No branches found. Auto-seeding from config...")
+            created_count = 0
+            
+            for code, display_name in BRANCH_DISPLAY_NAMES.items():
+                addr = get_branch_address(code)
+                state_match = re.search(r'\(([A-Z]{2})\)', display_name)
+                state_code = state_match.group(1) if state_match else 'MD'
+                
+                # Set default mileage based on branch if known
+                default_mileage = 0.67
+                if code == 'dchomecare':
+                    default_mileage = 0.70
+                
+                branch = models.Branch(
+                    branch_code=code,
+                    branch_name=display_name,
+                    office_name=addr['office_name'],
+                    street=addr['address_line_1'],
+                    city=addr['city'],
+                    branch_state=state_code,
+                    zipcode=addr['zip_code'],
+                    branch_phone=addr['tel'],
+                    branch_fax=addr['fax'],
+                    mileage=default_mileage,
+                    responsible_title=None,
+                    care_coordinator_name=None,
+                    admin_meds=False,
+                    corp_state_long=None,
+                    office_phone_corp=None,
+                    fein=None,
+                    is_corporate=False
+                )
+                db.add(branch)
+                created_count += 1
+                print(f"Auto-seeded: {code} - {display_name}")
+            
+            db.commit()
+            print(f"Success! Added {created_count} branches automatically.")
+        else:
+            print(f"Branches already exist. No action needed.")
+            
+            # Optional: Check if any branches are missing mileage values
+            branches_without_mileage = db.query(models.Branch).filter(
+                models.Branch.mileage == None
+            ).count()
+            if branches_without_mileage > 0:
+                print(f"⚠️  Warning: {branches_without_mileage} branches have no mileage set. Using default 0.67.")
+                
+    except Exception as e:
+        print(f"Error auto-seeding branches: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        db.close()
 
 # -------------------- TEMPLATES --------------------
 templates = Jinja2Templates(directory="templates")
@@ -32,6 +98,10 @@ models.Base.metadata.create_all(bind=engine)
 
 # -------------------- APP INIT --------------------
 app = FastAPI()
+
+# ===== CALL AUTO-SEED AT STARTUP =====
+# This will run automatically when the app starts
+ensure_branches_exist()
 
 # -------------------- CORS - UPDATED --------------------
 origins = [
@@ -51,6 +121,7 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*", "Content-Disposition"],
 )
+
 
 # -------------------- USER SCHEMA --------------------
 class UserCreate(BaseModel):
@@ -244,14 +315,19 @@ def create_agreement(
                 detail=f"Invalid branch code: {agreement.branch_code}"
             )
 
+    # Create new agreement with all fields
     new_agreement = models.Agreement(**agreement_data)
 
     db.add(new_agreement)
     db.commit()
     db.refresh(new_agreement)
+    
+    print(f"Agreement created with ID: {new_agreement.id}")
+    print(f"Fields saved: {agreement_data.keys()}")
 
     return new_agreement
 
+# -------------------- AGREEMENT PDF --------------------
 # -------------------- AGREEMENT PDF --------------------
 @app.get("/agreements/{agreement_id}/pdf")
 def download_agreement_pdf(
@@ -393,6 +469,16 @@ def download_agreement_pdf(
             "vehicle_authorization_initials": agreement.vehicle_authorization_initials or "",
             "PercCharged": str(getattr(agreement, 'perc_charged', '100')),
             "hazards": getattr(agreement, 'hazards', 'None Reported'),
+            
+            # ===== ADDED MISSING FIELDS =====
+            "inicontactdate": agreement.inicontactdate.strftime("%m/%d/%Y") if hasattr(agreement, 'inicontactdate') and agreement.inicontactdate else "",
+            "date_of_order": agreement.date_of_order.strftime("%m/%d/%Y") if hasattr(agreement, 'date_of_order') and agreement.date_of_order else "",
+            "required_services": getattr(agreement, 'required_services', ''),
+            "freq_of_visit": getattr(agreement, 'freq_of_visit', ''),
+            
+            "perc_charged": getattr(agreement, 'perc_charged', '100'),
+            "page1_cont_signature": getattr(agreement, 'page1_cont_signature', ''),
+            "page3_1_signature": getattr(agreement, 'page3_1_signature', ''),
             
             # Payment/Banking information
             "bank_name": agreement.bank_name or "",
