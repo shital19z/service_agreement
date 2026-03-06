@@ -125,24 +125,24 @@ def generate_page1(data):
     
     # Build the HTML with REDUCED SPACING
     html = f'''
-    <div>    
+   <div style="margin-top:0; padding-top:0;">    
         <!-- Header table - 2 columns -->
-        <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+        <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-top:0;">
             <tr>
-                <td width="25%" align="center" valign="top">
-                    <p style="font-size:10px; margin:0; line-height:1.2;">{office_addr}</p>
+               <td width="25%" align="center" valign="top" style="padding-top:0;">
+                    <p style="font-size:10px; margin:0; line-height:1;">{office_addr}</p>
                 </td>
                 <td width="70%" align="right" valign="top">
-                    <img style="width:2.0833in;height:0.9166in;" src="{logo_path}" />
+                   <img style="width:2.0833in;height:0.9166in; display:block;" src="{logo_path}" />
                 </td>
                 <td width="5%"></td>
             </tr>
         </table>
         
         <!-- Main info table - 3 columns with reduced padding -->
-        <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-top: 5px;">
+      <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-top:2px;">
             <tr>
-                <td width="30%" style="padding-top: 5px;">
+               <td width="30%" style="padding-top:2px;">
                     <p style="font-size:14px; margin:0; line-height:1.2;">
                         <u>Name Address of Responsible Party</u><br>
                         <b>
@@ -152,21 +152,21 @@ def generate_page1(data):
                         </b>               
                     </p>
                 </td>
-                <td width="40%" style="padding-top: 5px;" align="center" valign="bottom"></td>
-                <td width="30%" style="padding-top: 5px;" align="left" valign="middle">
+                <td width="40%" style="padding-top:2px;" align="center" valign="bottom"></td>
+                <td width="30%" style="padding-top:2px;" align="left" valign="middle">
                     <p style="font-size:14px; margin:0;">Date: <b>{agreement_date}</b></p>
                 </td>
             </tr>
             <tr>
-                <td colspan="3" style="text-align: center; padding-top: 5px;" align="center" valign="bottom">
+                <td colspan="3" style="text-align: center; padding-top:2px;" align="center" valign="bottom">
                     <p style="font-size:14px; margin:0; font-weight:bold;">SERVICE AGREEMENT</p>
                 </td>
             </tr>
             <tr>
-                <td width="65%" style="padding-top: 5px; font-size:14px;" valign="top">
+                <td width="65%" style="padding-top:2px; font-size:14px;" valign="top">
                     <p style="margin:0;">For Care Recipient: <b>{care_name}</b></p>
                 </td>
-                <td colspan="2" width="35%" style="padding-top: 5px; font-size:14px;" valign="top">
+                <td colspan="2" width="35%" style="padding-top:2px; font-size:14px;" valign="top">
                     <p style="margin:0;">residing at &nbsp; <b>{care_full_address}</b></p>
                 </td>
             </tr>
@@ -179,7 +179,7 @@ def generate_page1(data):
         initial_contact = data.get('inicontactdate', '')
         html += f'''
         <!-- 6-column table for SC/GA branches -->
-        <table width="95%" cellspacing="0" cellpadding="0" border="1" style="margin-top:5px; font-size:14px; border-collapse: collapse;">
+        <table width="95%" cellspacing="0" cellpadding="0" border="1" style="margin-top:2px; font-size:14px; border-collapse: collapse;">
             <tr>
                 <td width="13%" align="center" style="border:1px solid black; padding:2px;"><p style="margin:0;">Referral date</p></td>
                 <td width="16%" align="center" style="border:1px solid black; padding:2px;"><p style="margin:0;">Initial Contact with Client</p></td>
@@ -202,7 +202,7 @@ def generate_page1(data):
         # 5-column table for others
         html += f'''
         <!-- 5-column table for standard branches -->
-        <table width="95%" cellspacing="0" cellpadding="0" border="1" style="margin-top:5px; font-size:14px; border-collapse: collapse;">
+        <table width="95%" cellspacing="0" cellpadding="0" border="1" style="margin-top:2px; font-size:14px; border-collapse: collapse;">
             <tr>
                 <td width="16%" align="center" style="border:1px solid black; padding:2px;"><p style="margin:0;">Initial Inquiry date</p></td>
                 <td width="36%" align="center" style="border:1px solid black; padding:2px;"><p style="margin:0;">Start Order and/or Instructions Given by</p></td>
@@ -221,23 +221,23 @@ def generate_page1(data):
         '''
     
     # Required Services - UPDATED to use required_services field
-    blank_div = '<div style="height:5px"> &nbsp; </div>'
+    blank_div = '<div style="height:2px"> &nbsp; </div>'
     req_services = required_services or care_type or blank_div  # UPDATED
     
     html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:</p>
-            <p style="margin:2px 0;">{req_services}</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:</p>
+            <p style="margin:1px 0;">{req_services}</p>
         </div>
         
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>FREQUENCY DURATION OF VISITS:</u></b></p>
-            <p style="margin:2px 0;">{frequency}</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>FREQUENCY DURATION OF VISITS:</u></b></p>
+            <p style="margin:1px 0;">{frequency}</p>
         </div>
         
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>FEES:</u></b></p>
-            <p style="margin:2px 0;">${hourly_rate:.2f}/hr</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>FEES:</u></b></p>
+            <p style="margin:1px 0;">${hourly_rate:.2f}/hr</p>
         </div>
     '''
     
@@ -249,23 +249,23 @@ def generate_page1(data):
     ]
     if branch in hazards_branches and hazards:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>HAZARDS:</u></b></p>
-            <p style="margin:2px 0;">{hazards}</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>HAZARDS:</u></b></p>
+            <p style="margin:1px 0;">{hazards}</p>
         </div>
         '''
     
     # Caregiver competency (from PHP)
     if branch in ['hbhomecare', 'hbhomecare_staging']:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>CAREGIVER COMPETENCY REQUIREMENTS:</u></b></p>
-            <p style="margin:2px 0;">Before assigning a Direct Care Worker to provide services to a consumer, Options shall ensure that the Direct Care Worker has obtained a valid nurse's aide license in Pennsylvania, or has successfully completed a training program as stipulated in Pennsylvania's regulations, section 611.55, item 3.</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>CAREGIVER COMPETENCY REQUIREMENTS:</u></b></p>
+            <p style="margin:1px 0;">Before assigning a Direct Care Worker to provide services to a consumer, Options shall ensure that the Direct Care Worker has obtained a valid nurse's aide license in Pennsylvania, or has successfully completed a training program as stipulated in Pennsylvania's regulations, section 611.55, item 3.</p>
         </div>
         '''
     
     # Charges section with percentage logic (from PHP)
-    html += f'<div style="font-size:12px;margin-top:{top_margins};line-height:1.3;"><p style="margin:2px 0;"><b><u>CHARGES:</u></b> &nbsp;'
+    html += f'<div style="font-size:12px;margin-top:2px;line-height:1.2;"><p style="margin:1px 0;"><b><u>CHARGES:</u></b> &nbsp;'
     
     perc_branches = [
         'nvahomecare', 'nvahomecare_staging', 'rihomecare', 'rihomecare_staging',
@@ -281,22 +281,22 @@ def generate_page1(data):
     
     # Payment obligations
     html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>PAYMENT OBLIGATIONS:</u></b> &nbsp; The parties responsible for payment include the person who initiates arrangements for our services, as well as the care recipient and the care recipient's power of attorney or guardian. The responsibility for payment cannot be shifted simply by asking us to bill an insurance company or a third party. Your responsibility extends to making timely and prompt payments at all times. In the event the client or care recipient cancels a shift with less than 24-hour notice, then a charge for our minimum 2-hour visit will apply.</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>PAYMENT OBLIGATIONS:</u></b> &nbsp; The parties responsible for payment include the person who initiates arrangements for our services, as well as the care recipient and the care recipient's power of attorney or guardian. The responsibility for payment cannot be shifted simply by asking us to bill an insurance company or a third party. Your responsibility extends to making timely and prompt payments at all times. In the event the client or care recipient cancels a shift with less than 24-hour notice, then a charge for our minimum 2-hour visit will apply.</p>
         </div>
     '''
     
     # Federal holidays with 12-day logic for mnhomecare (from PHP)
     if branch in ['mnhomecare', 'mnhomecare_staging']:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 12 holidays as follows: New Year's Day, Martin Luther King Day, Presidents' Day, Easter Sunday, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans' Day, Thanksgiving Day, and Christmas Day.</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 12 holidays as follows: New Year's Day, Martin Luther King Day, Presidents' Day, Easter Sunday, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans' Day, Thanksgiving Day, and Christmas Day.</p>
         </div>
         '''
     else:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 11 holidays as follows: New Year's Day, Martin Luther King Day, Presidents' Day, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans' Day, Thanksgiving Day, and Christmas Day.</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 11 holidays as follows: New Year's Day, Martin Luther King Day, Presidents' Day, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans' Day, Thanksgiving Day, and Christmas Day.</p>
         </div>
         '''
     
@@ -316,13 +316,13 @@ def generate_page1(data):
     ]
     if branch in live_in_branches:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margins};line-height:1.3;">
-            <p style="margin:2px 0;"><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; OPTIONS care providers who provide live-in services have a standard work schedule of twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of sleep (five (5) of which must be uninterrupted), and four (4) hours for meals and breaks. During this twelve (12) hour period, the care provider is considered off-duty, and must be provided with adequate, private, and sanitary accommodations. In the event the care recipient requests our live-in care provider to provide services during an off-duty period, then you will be responsible for additional charges, beyond the daily live-in rate, at our standard hourly rate times the number of hours worked during the interruption period. If, as a result of such request, our care provider is unable to rest for an uninterrupted five (5) hours, then you will be billed at our standard hourly rate for the entire eight (8) hour sleep time period.</p>
+        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+            <p style="margin:1px 0;"><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; OPTIONS care providers who provide live-in services have a standard work schedule of twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of sleep (five (5) of which must be uninterrupted), and four (4) hours for meals and breaks. During this twelve (12) hour period, the care provider is considered off-duty, and must be provided with adequate, private, and sanitary accommodations. In the event the care recipient requests our live-in care provider to provide services during an off-duty period, then you will be responsible for additional charges, beyond the daily live-in rate, at our standard hourly rate times the number of hours worked during the interruption period. If, as a result of such request, our care provider is unable to rest for an uninterrupted five (5) hours, then you will be billed at our standard hourly rate for the entire eight (8) hour sleep time period.</p>
         </div>
         '''
     
     # Signature section - with reduced spacing
-    html += '<div style="page-break-inside: avoid; margin-top: 10px;">'
+    html += '<div style="page-break-inside: avoid; margin-top:5px;">'
     
     if branch in ['athomecare', 'athomecare_staging', 'scgahomecare', 'scgahomecare_staging']:
         html += get_signature_3col(clt_first, clt_last, clt_relationship, handled_by, current_date)
@@ -332,11 +332,85 @@ def generate_page1(data):
     html += '</div>'  # Close the page-break-inside div
     html += '</div>'  # Close the main div from the beginning
     
+     # ========== DEBUG CODE START ==========
+    # Calculate content metrics
+    content_length = len(html)
+    line_count = html.count('<p') + html.count('<div') + html.count('<tr')
+    word_count = len(html.split())
+    
+    # Get required services length
+    req_services_len = len(required_services or '')
+    hazards_len = len(hazards or '')
+    
+    # Standard page size information
+    print(f"\n{'='*70}")
+    print(f"PAGE 1 DEBUG for branch: {branch}")
+    print(f"{'='*70}")
+    
+    # Page size reference
+    print(f"\nPAGE SIZE REFERENCE:")
+    print(f"   • US Letter: 8.5\" × 11\" (612pt × 792pt)")
+    print(f"   • Printable area (with 0.75\" margins): 7\" × 9.5\"")
+    print(f"   • Your font sizes: Titles 14px (10.5pt), Body 12px (9pt)")
+    print(f"   • Theoretical capacity: ~4,500-5,000 characters")
+    
+    print(f"\nCURRENT METRICS:")
+    print(f"   • Content length: {content_length:6} characters")
+    print(f"   • Approximate lines: {line_count:4}")
+    print(f"   • Approximate words: {word_count:4}")
+    print(f"   • Required services: {req_services_len:4} chars")
+    print(f"   • Hazards: {hazards_len:4} chars")
+    
+    # Realistic thresholds based on page capacity
+    print(f"\nPAGE CAPACITY ANALYSIS:")
+    
+    if content_length < 3000:
+        percentage = int((content_length / 4500) * 100)
+        print(f"EXCELLENT: {content_length} chars - Plenty of space remaining")
+        print(f"(Using only {percentage}% of estimated page capacity)")
+    elif content_length < 3500:
+        percentage = int((content_length / 4500) * 100)
+        print(f"GOOD: {content_length} chars - Should fit comfortably")
+        print(f"(Using {percentage}% of estimated page capacity)")
+    elif content_length < 4000:
+        percentage = int((content_length / 4500) * 100)
+        print(f"MODERATE: {content_length} chars - May be tight")
+        print(f"     (Using {percentage}% of estimated page capacity)")
+    elif content_length < 4500:
+        percentage = int((content_length / 4500) * 100)
+        print(f"WARNING: {content_length} chars - Near page capacity")
+        print(f"(Using {percentage}% of estimated page capacity)")
+    else:
+        percentage = int((content_length / 4500) * 100)
+        print(f"CRITICAL: {content_length} chars - Exceeds estimated page capacity")
+        print(f"(Using {percentage}% of estimated page capacity)")
+        print(f"This will likely overflow to next page")
+    
+    # Content-specific warnings
+    if req_services_len > 300:
+        print(f"\nCONTENT NOTE: Required services is very long ({req_services_len} chars)")
+        print(f"   Consider if this can be summarized")
+    elif req_services_len > 200:
+        print(f"\nCONTENT NOTE: Required services is long ({req_services_len} chars)")
+    
+    if hazards_len > 150:
+        print(f"\n HAZARDS NOTE: Hazards section is long ({hazards_len} chars)")
+    
+    # Line count analysis
+    if line_count > 180:
+        print(f"\nLINE COUNT: {line_count} lines - Very dense")
+    elif line_count > 150:
+        print(f"\nLINE COUNT: {line_count} lines - Moderate density")
+    else:
+        print(f"\nLINE COUNT: {line_count} lines - Comfortable density")
+    
+    print(f"{'='*70}\n")
+   
     return html
+ 
 
 
-# Keep all your existing helper functions (get_office_address, get_top_margin, 
-# get_signature_3col, get_signature_2col) exactly as they are
+
 
 
 def get_office_address(branch, data):
@@ -402,21 +476,21 @@ def get_signature_3col(clt_first, clt_last, clt_relationship, handled_by, curren
     <!-- 3-column signature table -->
     <table width="100%" style="font-size:11.5px; margin-top:20px; border-collapse: collapse;" cellpadding="0" cellspacing="0">
         <tr>
-            <td style="padding-left:15px; padding-right:5px;" width="33%">
-                <p style="margin:0;"><b>{clt_first} {clt_last}</b></p>
-                <div style="border-top:2px solid black; width:100%; margin:5px auto;"></div>
-                <p style="margin:2px 0 0 0; text-align:center;">Name of Responsible Party</p>
-            </td>
-            <td style="padding-left:5px; padding-right:5px;" width="34%">
-                <p style="margin:0;"><b>{clt_relationship}</b></p>
-                <div style="border-top:2px solid black; width:100%; margin:5px auto;"></div>
-                <p style="margin:2px 0 0 0; text-align:center;">Relationship to Care Recipient</p>
-            </td>
-            <td style="padding-left:5px; padding-right:15px;" width="33%">
-                <p style="margin:0;"><b>{handled_by}</b></p>
-                <div style="border-top:2px solid black; width:100%; margin:5px auto;"></div>
-                <p style="margin:2px 0 0 0; text-align:center;">Options Representative</p>
-            </td>
+            <td width="33%" align="center" style="padding:0 5px;">
+    <p style="margin:0; text-align:center;"><b>{clt_first} {clt_last}</b></p>
+    <div style="border-top:2px solid black; width:90%; margin:5px auto;"></div>
+    <p style="margin:2px 0 0 0; text-align:center;">Name of Responsible Party</p>
+</td>
+<td width="34%" align="center" style="padding:0 5px;">
+    <p style="margin:0; text-align:center;"><b>{clt_relationship}</b></p>
+    <div style="border-top:2px solid black; width:90%; margin:5px auto;"></div>
+    <p style="margin:2px 0 0 0; text-align:center;">Relationship to Care Recipient</p>
+</td>
+<td width="33%" align="center" style="padding:0 5px;">
+    <p style="margin:0; text-align:center;"><b>{handled_by}</b></p>
+    <div style="border-top:2px solid black; width:90%; margin:5px auto;"></div>
+    <p style="margin:2px 0 0 0; text-align:center;">Options Representative</p>
+</td>
         </tr>
         <tr>
             <td align="center" style="padding-top:15px;">

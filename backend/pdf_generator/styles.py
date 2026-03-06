@@ -23,7 +23,7 @@ def get_styles(margins):
                 -pdf-frame-content: footer_content;
                 left: {margins['left']}in;
                 width: {8.5 - margins['left'] - margins['right']}in;
-                top: {11 - margins['bottom'] - 0.5}in;
+                top: {12 - margins['bottom'] - 0.5}in;
                 height: 0.5in;
             }}
         }}

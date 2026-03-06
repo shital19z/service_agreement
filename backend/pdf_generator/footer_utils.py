@@ -59,6 +59,24 @@ def get_footer_tag(branch, care_state, page_num):
             return "CFVA 2020-02-22"
         elif branch in ['nspahomecare', 'nspahomecare_staging']:
             return "NSPA 2022-01-02"
+        # Arizona branches - using PA pattern date
+        elif branch in ['chazhomecare', 'chazhomecare_staging']:
+            return "AZ 2019-12-10"
+        # Maryland branches
+        elif branch in ['blmdhomecare', 'blmdhomecare_staging']:
+            return "BLMD 2019-09-16"
+        # Florida branches - using FL pattern
+        elif branch in ['wpbflhomecare', 'wpbflhomecare_staging']:
+            return "WPBFL 2017-06-19"
+        elif branch in ['lzflhomecare', 'lzflhomecare_staging']:
+            return "LZFL 2017-06-19"
+        elif branch in ['woflhomecare', 'woflhomecare_staging']:
+            return "WOFL 2017-06-19"
+        # Virginia branches
+        elif branch in ['sfvahomecare', 'sfvahomecare_staging']:
+            return "SFVA 2020-01-15"
+        elif branch in ['amfvahomecare', 'amfvahomecare_staging']:
+            return "AMFVA 2020-01-15"
     
     # Page 2 footer
     elif page_num == 2:
@@ -100,6 +118,27 @@ def get_footer_tag(branch, care_state, page_num):
             return "WFVA 2020-01-03"
         elif branch in ['cfairfaxhomecare', 'cfairfaxhomecare_staging']:
             return "CFVA 2020-02-22"
+        # nspahomecare for page 2
+        elif branch in ['nspahomecare', 'nspahomecare_staging']:
+            return "NSPA 2020-04-30"
+        # Arizona branches
+        elif branch in ['chazhomecare', 'chazhomecare_staging']:
+            return "AZ 2019-12-10"
+        # Maryland branches
+        elif branch in ['blmdhomecare', 'blmdhomecare_staging']:
+            return "BLMD 2017-06-19"
+        # Florida branches
+        elif branch in ['wpbflhomecare', 'wpbflhomecare_staging']:
+            return "WPBFL 2017-06-19"
+        elif branch in ['lzflhomecare', 'lzflhomecare_staging']:
+            return "LZFL 2017-06-19"
+        elif branch in ['woflhomecare', 'woflhomecare_staging']:
+            return "WOFL 2017-06-19"
+        # Virginia branches
+        elif branch in ['sfvahomecare', 'sfvahomecare_staging']:
+            return "SFVA 2020-01-15"
+        elif branch in ['amfvahomecare', 'amfvahomecare_staging']:
+            return "AMFVA 2020-01-15"
     
     # Page 3 footer
     elif page_num == 3:
@@ -143,6 +182,27 @@ def get_footer_tag(branch, care_state, page_num):
             return "WFVA 2020-01-03"
         elif branch in ['cfairfaxhomecare', 'cfairfaxhomecare_staging']:
             return "CFVA 2020-02-22"
+        # nspahomecare for page 3
+        elif branch in ['nspahomecare', 'nspahomecare_staging']:
+            return "NSPA - 2022-01-02"
+        # Arizona branches
+        elif branch in ['chazhomecare', 'chazhomecare_staging']:
+            return "AZ - 2019-12-10"
+        # Maryland branches
+        elif branch in ['blmdhomecare', 'blmdhomecare_staging']:
+            return "BLMD - 2017-04-12"
+        # Florida branches
+        elif branch in ['wpbflhomecare', 'wpbflhomecare_staging']:
+            return "WPBFL - 2017-05-18"
+        elif branch in ['lzflhomecare', 'lzflhomecare_staging']:
+            return "LZFL - 2017-05-18"
+        elif branch in ['woflhomecare', 'woflhomecare_staging']:
+            return "WOFL - 2017-05-18"
+        # Virginia branches
+        elif branch in ['sfvahomecare', 'sfvahomecare_staging']:
+            return "SFVA - 2020-01-15"
+        elif branch in ['amfvahomecare', 'amfvahomecare_staging']:
+            return "AMFVA - 2020-01-15"
     
     elif page_num == 4:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
@@ -185,6 +245,27 @@ def get_footer_tag(branch, care_state, page_num):
             return "WFVA 2020-01-03"
         elif branch in ['cfairfaxhomecare', 'cfairfaxhomecare_staging']:
             return "CFVA 2020-02-22"
+        # nspahomecare for page 4
+        elif branch in ['nspahomecare', 'nspahomecare_staging']:
+            return "NSPA - 2022-01-02"
+        # Arizona branches
+        elif branch in ['chazhomecare', 'chazhomecare_staging']:
+            return "AZ - 2019-12-10"
+        # Maryland branches
+        elif branch in ['blmdhomecare', 'blmdhomecare_staging']:
+            return "BLMD - 2017-04-12"
+        # Florida branches
+        elif branch in ['wpbflhomecare', 'wpbflhomecare_staging']:
+            return "WPBFL - 2017-05-18"
+        elif branch in ['lzflhomecare', 'lzflhomecare_staging']:
+            return "LZFL - 2017-05-18"
+        elif branch in ['woflhomecare', 'woflhomecare_staging']:
+            return "WOFL - 2017-05-18"
+        # Virginia branches
+        elif branch in ['sfvahomecare', 'sfvahomecare_staging']:
+            return "SFVA - 2020-01-15"
+        elif branch in ['amfvahomecare', 'amfvahomecare_staging']:
+            return "AMFVA - 2020-01-15"
         
     elif page_num == 5:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
@@ -227,5 +308,26 @@ def get_footer_tag(branch, care_state, page_num):
             return "WFVA 2020-01-03"
         elif branch in ['cfairfaxhomecare', 'cfairfaxhomecare_staging']:
             return "CFVA 2020-02-22"
+        # nspahomecare for page 5
+        elif branch in ['nspahomecare', 'nspahomecare_staging']:
+            return "NSPA - 2022-01-02"
+        # Arizona branches
+        elif branch in ['chazhomecare', 'chazhomecare_staging']:
+            return "AZ - 2019-12-10"
+        # Maryland branches
+        elif branch in ['blmdhomecare', 'blmdhomecare_staging']:
+            return "BLMD - 2017-04-12"
+        # Florida branches
+        elif branch in ['wpbflhomecare', 'wpbflhomecare_staging']:
+            return "WPBFL - 2017-05-18"
+        elif branch in ['lzflhomecare', 'lzflhomecare_staging']:
+            return "LZFL - 2017-05-18"
+        elif branch in ['woflhomecare', 'woflhomecare_staging']:
+            return "WOFL - 2017-05-18"
+        # Virginia branches
+        elif branch in ['sfvahomecare', 'sfvahomecare_staging']:
+            return "SFVA - 2020-01-15"
+        elif branch in ['amfvahomecare', 'amfvahomecare_staging']:
+            return "AMFVA - 2020-01-15"
     
     return ""
