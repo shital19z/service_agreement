@@ -15,7 +15,8 @@ def get_content_category(branch, care_state):
         'lphomecare', 'lphomecare_staging', 
         'testhomecare',
         'wenjhomecare', 'wenjhomecare_staging',# NJ branches
-        'tomdhomecare', 'tomdhomecare_staging'    
+        'tomdhomecare', 'tomdhomecare_staging' ,
+        'wenjhomecare', 'wenjhomecare_staging'   
         
     ]
     
@@ -168,7 +169,8 @@ def generate_page2(data):
         'anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
         'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
         'lphomecare', 'lphomecare_staging', 'testhomecare',
-        'tomdhomecare', 'tomdhomecare_staging' 
+        'tomdhomecare', 'tomdhomecare_staging',
+        'wenjhomecare', 'wenjhomecare_staging'
     ]
     
     # Also include dchomecare when it's NOT in DC (Maryland)
