@@ -417,6 +417,7 @@ def get_office_address(branch, data):
     """Get office address based on branch (from PHP)"""
     branch_lower = branch.lower()
     
+    # Special cases with unique addresses
     if branch_lower in ['scgahomecare', 'scgahomecare_staging']:
         return '2110 Powers Ferry Rd <br>Suite 306 <br>Atlanta, GA 30339<br>_______________________________<br>Tel: 404.634.1111 <br>Fax: 404.634.1199'
     elif branch_lower in ['gbhomecare', 'gbhomecare_staging']:
@@ -454,7 +455,18 @@ def get_office_address(branch, data):
     elif branch_lower in ['wpbflhomecare', 'wpbflhomecare_staging']:
         return 'Options For Senior America <br>2300 Palm Beach Lakes Blvd<br> Suite 300-A<br>West Palm Beach, FL 33409<br>_______________________________<br>Tel:  <br>Fax: '
     
-    # Default corporate address
+    # All branches that should return the corporate address
+    corporate_branches = [
+        'clhomecare', 'clhomecare_staging',
+        'nvahomecare', 'nvahomecarearchive', 'nvahomecare_staging', 'rihomecare', 'rihomecare_staging',
+        'hbhomecare', 'hbhomecare_staging',
+        'lzflhomecare', 'lzflhomecare_staging'
+    ]
+    
+    if branch_lower in corporate_branches:
+        return 'Corporate Office <br>6 Montgomery Village Avenue<br>Suite 330<br>Gaithersburg, MD 20879<br>_______________________________<br>Tel: 301.562.1100 <br>Fax: 301.562.1133'
+    
+    # Default to corporate address for any unmatched branch
     return 'Corporate Office <br>6 Montgomery Village Avenue<br>Suite 330<br>Gaithersburg, MD 20879<br>_______________________________<br>Tel: 301.562.1100 <br>Fax: 301.562.1133'
 
 def get_top_margin(branch):

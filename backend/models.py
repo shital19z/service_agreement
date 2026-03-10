@@ -4,6 +4,7 @@ from sqlalchemy import (
     String,
     Float,
     Date,
+    DateTime, 
     ForeignKey,
     Boolean,
     Text,
@@ -13,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from database import Base
 import decimal
+from datetime import datetime 
 
 
 # Custom type for PostgreSQL numeric
@@ -53,27 +55,27 @@ class Branch(Base):
 
     id = Column(Integer, primary_key=True)
     branch_name = Column(String, nullable=True)
-    branch_code = Column(String(50), unique=True, index=True, nullable=False)
+    branch_code = Column(String, unique=True, index=True, nullable=False)
     responsible_title = Column(String, nullable=True)
     care_coordinator_name = Column(String, nullable=True)
-    branch_phone = Column(String(25), nullable=True)
-    branch_state = Column(String(2), nullable=True)
+    branch_phone = Column(String, nullable=True)
+    branch_state = Column(String, nullable=True)
     mileage = Column(Float, nullable=True)
     admin_meds = Column(Boolean, default=False)
     street = Column(Text, nullable=True)
-    city = Column(String(100), nullable=True)
-    zipcode = Column(String(10), nullable=True)
-    corp_state_long = Column(String(100), nullable=True)
-    office_phone_corp = Column(String(25), nullable=True)
-    fein = Column(String(20), nullable=True)
-    branch_fax = Column(String(25), nullable=True)
+    city = Column(String, nullable=True)
+    zipcode = Column(String, nullable=True)
+    corp_state_long = Column(String, nullable=True)
+    office_phone_corp = Column(String, nullable=True)
+    fein = Column(String, nullable=True)
+    branch_fax = Column(String, nullable=True)
     office_name = Column(Text, nullable=True)
     address_line_1 = Column(Text, nullable=True)
-    state_code = Column(String(2), nullable=True)
-    zip_code = Column(String(10), nullable=True)
+    state_code = Column(String, nullable=True)
+    zip_code = Column(String, nullable=True)
     is_corporate = Column(Boolean, default=False)
     address_line_2 = Column(Text, nullable=True) 
-    fax = Column(String(25), nullable=True)
+    fax = Column(String, nullable=True)
     tel = Column(String)
 
     # Relationship
@@ -99,8 +101,8 @@ class Agreement(Base):
     clt_phone = Column(String, nullable=True)
     clt_address = Column(String, nullable=False)
     clt_city = Column(String, nullable=True)
-    clt_state = Column(String(2), default="MD")
-    clt_zip = Column(String(10), nullable=True)
+    clt_state = Column(String, default="MD")
+    clt_zip = Column(String, nullable=True)
     responsible_party = Column(String, nullable=True)
     clt_relationship = Column(String, nullable=True, default="Self")
 
@@ -111,8 +113,8 @@ class Agreement(Base):
     care_dob = Column(Date, nullable=True)
     care_recipient_address = Column(String, nullable=True)
     care_city = Column(String, nullable=True)
-    care_state = Column(String(2), default="MD")
-    care_zip = Column(String(10), nullable=True)
+    care_state = Column(String, default="MD")
+    care_zip = Column(String, nullable=True)
 
     # SECTION 3: SERVICE
     branch_code = Column(
@@ -143,7 +145,7 @@ class Agreement(Base):
     
     # Additional service details
     vehicle_authorized = Column(Boolean, default=False)  
-    vehicle_authorization_initials = Column(String(10), nullable=True)
+    vehicle_authorization_initials = Column(String, nullable=True)
     medication_administration = Column(Boolean, default=False)
 
     # ===== ADDED MISSING FIELDS =====
@@ -161,14 +163,14 @@ class Agreement(Base):
     # SECTION 4: PAYMENT
     bank_name = Column(String, nullable=True)
     bank_city = Column(String, nullable=True)
-    bank_state = Column(String(2), nullable=True)
+    bank_state = Column(String, nullable=True)
     routing_number = Column(String, nullable=True)
     account_number = Column(String, nullable=True)
     account_type = Column(String, default="Checking")
     payment_method = Column(String, default="Direct Debit")
 
     # SECTION 5: SIGNATURES
-    client_initials = Column(String(5), nullable=True)
+    client_initials = Column(String, nullable=True)
     client_sign_date = Column(Date, nullable=True)
     rep_sign_date = Column(Date, nullable=True)
     client_signature = Column(Text, nullable=True)
@@ -186,3 +188,21 @@ class Agreement(Base):
 
     owner = relationship("User", back_populates="agreements")
     branch = relationship("Branch", back_populates="agreements")
+    
+    
+# -------------------- SHARED AGREEMENT --------------------
+class SharedAgreement(Base):
+    __tablename__ = "shared_agreements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String, unique=True, index=True, nullable=False)
+    agreement_id = Column(Integer, ForeignKey("agreements.id"), nullable=False)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False)
+    views = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+
+    # Relationships
+    agreement = relationship("Agreement", foreign_keys=[agreement_id])
+    creator = relationship("User", foreign_keys=[created_by])

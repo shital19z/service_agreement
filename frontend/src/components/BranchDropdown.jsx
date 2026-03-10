@@ -41,7 +41,7 @@ const BranchDropdown = ({ onBranchChange, selectedValue }) => {
                 branch_code: branchObj.branch_code,
                 branch_name: branchObj.branch_name,
                 // Match the backend key 'branch_state'
-                state_code: branchObj.branch_state || 'MD' 
+                state_code: branchObj.branch_state
             });
         } else {
             onBranchChange(null);

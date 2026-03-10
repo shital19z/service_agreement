@@ -1,0 +1,155 @@
+.shared-container {
+    min-height: 100vh;
+    background-color: #f8fafc;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.shared-header {
+    background: linear-gradient(135deg, #1a2b4b 0%, #2c3e6b 100%);
+    color: white;
+    padding: 30px 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.shared-header h1 {
+    margin: 0 0 15px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+}
+
+.agreement-info {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 20px;
+    border-radius: 10px;
+}
+
+.agreement-info p {
+    margin: 0;
+    font-size: 15px;
+    color: #e2e8f0;
+}
+
+.agreement-info strong {
+    color: white;
+    font-weight: 600;
+}
+
+.pdf-viewer {
+    flex: 1;
+    padding: 20px;
+    min-height: 70vh;
+}
+
+.pdf-iframe {
+    width: 100%;
+    height: 80vh;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+.shared-footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 13px;
+    border-top: 1px solid #e2e8f0;
+    background: white;
+}
+
+.shared-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #4facfe;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.shared-error {
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.shared-error h2 {
+    color: #ef4444;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.shared-error p {
+    color: #64748b;
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.pdf-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    background: white;
+    border-radius: 10px;
+    color: #64748b;
+    font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .shared-header {
+        padding: 20px;
+    }
+    
+    .shared-header h1 {
+        font-size: 24px;
+    }
+    
+    .agreement-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pdf-iframe {
+        height: 70vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .shared-header {
+        padding: 15px;
+    }
+    
+    .shared-header h1 {
+        font-size: 20px;
+    }
+    
+    .pdf-iframe {
+        height: 60vh;
+    }
+}
