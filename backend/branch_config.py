@@ -658,3 +658,4 @@ def format_holidays_list(holidays: List[str]) -> str:
         return holidays[0] + "."
     return ", ".join(holidays[:-1]) + ", and " + holidays[-1] + "."
 
+

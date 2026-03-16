@@ -17,7 +17,7 @@ def generate_page1_cont(data):
     # Get values directly from cleaned data
     branch = clean_data.get('branch_code', '').lower()
     branch_data = clean_data.get('branch_data', {})
-    care_state = clean_data.get('care_state', '').upper()
+    care_state = (clean_data.get('care_state') or '').upper()
     
     # Get client information directly from cleaned data
     clt_first = clean_data.get('clt_first_name', '')
@@ -76,26 +76,45 @@ def generate_page1_cont(data):
     ]
     
     if branch in needs_assessment_branches:
+        _needs_assessment_body = clean_data.get('needs_assessment_text', '').strip() or (
+            "When a Needs Assessment and a Plan of Care is conducted by Options staff, the associated $95 fee is "
+            "waived for any ongoing case that requires more than thirty (30) service hours per week. Otherwise, "
+            "this fee is included on the Options invoice."
+        )
+        _valuables_body = clean_data.get('valuables_text', '').strip() or (
+            "Our care providers are not authorized to accept payments directly, nor to have use or custody of any "
+            "valuables belonging to you (credit cards, checkbooks, cash, and the like). Common sense dictates that "
+            "you be careful with such valuables, and alert OPTIONS and the police should you notice a loss."
+        )
         html += f'''
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>NEEDS ASSESSMENT & PLAN OF CARE:</u></b> &nbsp; When a Needs Assessment and a Plan of Care is conducted by Options staff, the associated $95 fee is waived for any ongoing case that requires more than thirty (30) service hours per week. Otherwise, this fee is included on the Options invoice.</p>
+            <p style="margin:3px 0;"><b><u>NEEDS ASSESSMENT &amp; PLAN OF CARE:</u></b> &nbsp; {_needs_assessment_body}</p>
         </div>
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>YOUR VALUABLES:</u></b> &nbsp; Our care providers are not authorized to accept payments directly, nor to have use or custody of any valuables belonging to you (credit cards, checkbooks, cash, and the like). Common sense dictates that you be careful with such valuables, and alert OPTIONS and the police should you notice a loss.</p>
+            <p style="margin:3px 0;"><b><u>YOUR VALUABLES:</u></b> &nbsp; {_valuables_body}</p>
         </div>
         '''
     
-    # Notice Period
-    if branch in ['hbhomecare', 'hbhomecare_staging', 'nspahomecare', 'nspahomecare_staging']:
-        html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>NOTICE PERIOD:</u></b> &nbsp; The care recipient or his/her designees are not obligated to give a written notice of termination. OPTIONS may end services under this agreement by giving at least 10 calendar days advance written notice of the intent to terminate services. Less than 10 days advance written notice may be provided by OPTIONS in the event the client has failed to pay for services, despite notice, and the client is more than 14 days in arrears, or if the health and welfare of the OPTIONS caregiver is at risk.</p>
-        </div>
-        '''
+    # Notice Period - dynamic from branch template, fallback to branch-specific defaults
+    _notice_period_custom = clean_data.get('notice_period_text', '')
+    if _notice_period_custom and _notice_period_custom.strip():
+        _notice_period_body = _notice_period_custom.strip()
+    elif branch in ['hbhomecare', 'hbhomecare_staging', 'nspahomecare', 'nspahomecare_staging']:
+        _notice_period_body = (
+            "The care recipient or his/her designees are not obligated to give a written notice of termination. "
+            "OPTIONS may end services under this agreement by giving at least 10 calendar days advance written notice "
+            "of the intent to terminate services. Less than 10 days advance written notice may be provided by OPTIONS "
+            "in the event the client has failed to pay for services, despite notice, and the client is more than 14 "
+            "days in arrears, or if the health and welfare of the OPTIONS caregiver is at risk."
+        )
     else:
-        html += f'''
+        _notice_period_body = (
+            "The care recipient or his/her designees are not obligated to give a written notice of termination. "
+            "OPTIONS may end services under this agreement by giving 3 calendar days notice in writing."
+        )
+    html += f'''
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>NOTICE PERIOD:</u></b> &nbsp; The care recipient or his/her designees are not obligated to give a written notice of termination. OPTIONS may end services under this agreement by giving 3 calendar days notice in writing.</p>
+            <p style="margin:3px 0;"><b><u>NOTICE PERIOD:</u></b> &nbsp; {_notice_period_body}</p>
         </div>
         '''
     
@@ -112,10 +131,17 @@ def generate_page1_cont(data):
         'nspahomecare', 'nspahomecare_staging', 'lzflhomecare', 'lzflhomecare_staging'
     ]
     
+    _med_default = (
+        "For those care recipients who require administration of medication, if the care recipient is not cognitively "
+        "competent, and a family member is unavailable to administer the medication on a weekly basis, we will assign "
+        "an RN or CMT to make weekly visits to administer and dispense the medication at the rate of $75/visit."
+    )
+    _medication_body = clean_data.get('medication_text', '').strip() or _med_default
+
     if branch in med_branches:
         html += f'''
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; For those care recipients who require administration of medication, if the care recipient is not cognitively competent, and a family member is unavailable to administer the medication on a weekly basis, we will assign an RN or CMT to make weekly visits to administer and dispense the medication at the rate of $75/visit.</p>
+            <p style="margin:3px 0;"><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; {_medication_body}</p>
         </div>
         '''
     
@@ -123,27 +149,60 @@ def generate_page1_cont(data):
     if branch in ['dchomecare', 'dchomecare_staging'] and care_state == "DC":
         html += f'''
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; For those care recipients who require administration of medication, if the care recipient is not cognitively competent, and a family member is unavailable to administer the medication on a weekly basis, we will assign an RN or CMT to make weekly visits to administer and dispense the medication at the rate of $75/visit.</p>
+            <p style="margin:3px 0;"><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; {_medication_body}</p>
         </div>
         '''
     
-    # Common sections for all branches
+    # Common sections for all branches - fully dynamic with fallback defaults
+    _cannot_hire_body = clean_data.get('cannot_hire_text', '').strip() or (
+        "You understand that OPTIONS is not a staffing agency and acknowledge the substantial effort and expense "
+        "incurred by OPTIONS in screening, interviewing, and recruiting care providers. The care providers we "
+        "introduce to you are not, under any circumstance, to become employed by you, whether per your request or "
+        "theirs, and whether during or after using our services. If you wish to employ our care provider after a one "
+        "year period of care provider's termination of employment with you, you agree to pay OPTIONS the larger of a "
+        "lump-sum placement fee of nine thousand dollars ($9,000) or the value of eight (8) weeks of service charges "
+        "based on the frequency of visits and the fees as stipulated in this agreement. This amount will be due in "
+        "10 calendar days from the date our care provider begins employment with you."
+    )
+    _record_keeping_body = clean_data.get('record_keeping_text', '').strip() or (
+        "It is standard policy and practice at OPTIONS that each care provider keeps track of their time worked and "
+        "the tasks provided on a Daily Progress Notes form. You and the care recipient must allow OPTIONS care "
+        "providers reasonable time to complete this form which must be signed by you or the care recipient each week. "
+        "If you and the care recipient do not wish to sign this form, you must tell OPTIONS in writing. In this "
+        "instance, the form will continue to be filled out by the care provider, and the lack of your or the care "
+        "recipient's signature does not constitute a reason to dispute the hours worked or the completed tasks by "
+        "the care provider."
+    )
+    _mileage_body = clean_data.get('mileage_reimbursement_text', '').strip() or (
+        f"Mileage will be charged at the rate of ${mileage_rate:.2f} per mile when the Care Provider is required "
+        "to use their personal vehicle in order to perform required duties such as errands, shopping, appointments, "
+        "etc. for the Care Recipient. When the Care Provider utilizes the Care Recipient's vehicle to perform the "
+        "above mentioned duties, there will be no mileage reimbursement charge."
+    )
+
     html += f'''
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>OUR CARE PROVIDERS CANNOT BE HIRED BY YOU:</u></b> &nbsp; You understand that OPTIONS is not a staffing agency and acknowledge the substantial effort and expense incurred by OPTIONS in screening, interviewing, and recruiting care providers. The care providers we introduce to you are not, under any circumstance, to become employed by you, whether per your request or theirs, and whether during or after using our services. If you wish to employ our care provider after a one year period of care provider's termination of employment with you, you agree to pay OPTIONS the larger of a lump-sum placement fee of nine thousand dollars ($9,000) or the value of eight (8) weeks of service charges based on the frequency of visits and the fees as stipulated in this agreement. This amount will be due in 10 calendar days from the date our care provider begins employment with you.</p>
+            <p style="margin:3px 0;"><b><u>OUR CARE PROVIDERS CANNOT BE HIRED BY YOU:</u></b> &nbsp; {_cannot_hire_body}</p>
         </div>
         
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>RECORD KEEPING:</u></b> &nbsp; It is standard policy and practice at OPTIONS that each care provider keeps track of their time worked and the tasks provided on a Daily Progress Notes form. You and the care recipient must allow OPTIONS care providers reasonable time to complete this form which must be signed by you or the care recipient each week. If you and the care recipient do not wish to sign this form, you must tell OPTIONS in writing. In this instance, the form will continue to be filled out by the care provider, and the lack of your or the care recipient's signature does not constitute a reason to dispute the hours worked or the completed tasks by the care provider.</p>
+            <p style="margin:3px 0;"><b><u>RECORD KEEPING:</u></b> &nbsp; {_record_keeping_body}</p>
         </div>
         
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
-            <p style="margin:3px 0;"><b><u>MILEAGE REIMBURSEMENT:</u></b> &nbsp; Mileage will be charged at the rate of ${mileage_rate:.2f} per mile when the Care Provider is required to use their personal vehicle in order to perform required duties such as errands, shopping, appointments, etc. for the Care Recipient. When the Care Provider utilizes the Care Recipient's vehicle to perform the above mentioned duties, there will be no mileage reimbursement charge.</p>
+            <p style="margin:3px 0;"><b><u>MILEAGE REIMBURSEMENT:</u></b> &nbsp; {_mileage_body}</p>
         </div>
     '''
     
-    # Vehicle authorization - different for GA/SC branches
-    if branch in ['scgahomecare', 'scgahomecare_staging', 'athomecare', 'athomecare_staging']:
+    # Vehicle authorization - dynamic with branch-specific fallback
+    _vehicle_custom = clean_data.get('vehicle_use_text', '').strip()
+    if _vehicle_custom:
+        html += f'''
+        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+            <p style="margin:3px 0;"><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; {_vehicle_custom}</p>
+        </div>
+        '''
+    elif branch in ['scgahomecare', 'scgahomecare_staging', 'athomecare', 'athomecare_staging']:
         html += f'''
         <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
             <p style="margin:3px 0;"><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; If you wish to authorize our care providers to drive your/the care recipient’s vehicle and hold Options and its care providers harmless and release them from any associated liability, please check the “Yes” box and place your initials next to it, or otherwise check the “No” box and place your initials next to it.&nbsp;&nbsp;<input type="checkbox" style="width:12px;height:12px;"> Yes _______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" style="width:12px;height:12px;"> No _______</p>
@@ -161,12 +220,12 @@ def generate_page1_cont(data):
     html += f'''
     <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
         <p style="margin:3px 0;"><b><u>GENERAL PROVISIONS:</u></b></p>
-        <ol type="a" style="padding-left: 25px; margin:3px 0;">
-            <li style="margin-bottom:2px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</li>
-            <li style="margin-bottom:2px;">No change, modification, termination, or attempted waiver of any of the provisions of this Agreement shall be binding upon Options or the undersigned unless put in writing and signed by Options and the undersigned.</li>
-            <li style="margin-bottom:2px;">This Agreement shall be governed by the laws of the state of {gen_prov_state}.</li>
-            <li style="margin-bottom:2px;">This Agreement supersedes all prior agreements and understandings, oral or written, between Options and the undersigned with respect to the subject matter hereof.</li>
-        </ol>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:3px 0;">
+            <tr><td width="20px" valign="top" style="font-size:12px;">a.</td><td style="font-size:12px; padding-bottom:3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</td></tr>
+            <tr><td width="20px" valign="top" style="font-size:12px;">b.</td><td style="font-size:12px; padding-bottom:3px;">No change, modification, termination, or attempted waiver of any of the provisions of this Agreement shall be binding upon Options or the undersigned unless put in writing and signed by Options and the undersigned.</td></tr>
+            <tr><td width="20px" valign="top" style="font-size:12px;">c.</td><td style="font-size:12px; padding-bottom:3px;">This Agreement shall be governed by the laws of the state of {gen_prov_state}.</td></tr>
+            <tr><td width="20px" valign="top" style="font-size:12px;">d.</td><td style="font-size:12px; padding-bottom:3px;">This Agreement supersedes all prior agreements and understandings, oral or written, between Options and the undersigned with respect to the subject matter hereof.</td></tr>
+        </table>
     </div>
     '''
     

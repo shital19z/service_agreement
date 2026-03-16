@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { endpoint } from '../resource/Constant';
 import BranchModal from "./BranchModal";
-import BranchContentEditor from "./BranchContentEditor"; // Add this import
+import BranchContentEditor from "./BranchContentEditor";
 import CopyContentModal from "./CopyContentModal";
 
-const BranchesList = ({ token }) => {
+const BranchesList = ({ token, onBranchesChanged, onCreateAgreement }) => {
     const [branches, setBranches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingBranch, setEditingBranch] = useState(null);
+    const [initialLoadDone, setInitialLoadDone] = useState(false);
     
-    // Add these new state variables
+    // State variables for content editing and copying
     const [showContentEditor, setShowContentEditor] = useState(false);
     const [selectedBranchForContent, setSelectedBranchForContent] = useState(null);
     const [showCopyModal, setShowCopyModal] = useState(false);
@@ -39,6 +40,9 @@ const BranchesList = ({ token }) => {
             const data = await response.json();
             setBranches(data);
             setError('');
+            // Notify parent (Dashboard) to refresh its branch list, but skip on initial load
+            if (initialLoadDone && onBranchesChanged) onBranchesChanged();
+            setInitialLoadDone(true);
         } catch (err) {
             console.error("Error fetching branches:", err);
             setError('Failed to load branches');
@@ -67,7 +71,6 @@ const BranchesList = ({ token }) => {
         }
     };
 
-    // Add these new handler functions
     const handleEditContent = (branch) => {
         setSelectedBranchForContent(branch);
         setShowContentEditor(true);
@@ -419,15 +422,40 @@ const BranchesList = ({ token }) => {
                                 </button>
                             </div>
 
-                            {/* Delete Button - Separate row */}
+                            {/* Delete Button and Create Agreement - Separate row */}
                             <div style={{
                                 padding: '0 20px 16px 20px',
-                                background: '#f8fafc'
+                                background: '#f8fafc',
+                                display: 'flex',
+                                gap: '8px'
                             }}>
+                                {/* Create Agreement Button */}
+                                {onCreateAgreement && (
+                                    <button 
+                                        onClick={() => onCreateAgreement(branch.branch_code)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '8px 0',
+                                            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            fontSize: '13px',
+                                            fontWeight: '500',
+                                            cursor: 'pointer',
+                                            transition: 'opacity 0.2s'
+                                        }}
+                                        onMouseOver={(e) => e.target.style.opacity = '0.85'}
+                                        onMouseOut={(e) => e.target.style.opacity = '1'}
+                                        title="Create a new agreement using this branch"
+                                    >
+                                        + New Agreement
+                                    </button>
+                                )}
                                 <button 
                                     onClick={() => handleDelete(branch.branch_code, branch.branch_name)}
                                     style={{
-                                        width: '100%',
+                                        flex: 1,
                                         padding: '8px 0',
                                         background: 'white',
                                         color: '#ef4444',
@@ -477,8 +505,8 @@ const BranchesList = ({ token }) => {
                     setSelectedBranchForContent(null);
                 }}
                 onSave={() => {
-                    // Optionally refresh or show success
-                    console.log('Content updated');
+                    setShowContentEditor(false);
+                    setSelectedBranchForContent(null);
                 }}
                 token={token}
                 branchCode={selectedBranchForContent?.branch_code}

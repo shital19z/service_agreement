@@ -11,7 +11,7 @@ class AgreementBase(BaseModel):
     clt_phone: Optional[str] = None
     clt_address: str
     clt_city: Optional[str] = None
-    clt_state: Optional[str] = "MD"
+    clt_state: Optional[str] = None
     clt_zip: Optional[str] = None
     responsible_party: Optional[str] = None
     clt_relationship: str = "Self" 
@@ -23,11 +23,11 @@ class AgreementBase(BaseModel):
     care_dob: Optional[date] = None
     care_recipient_address: Optional[str] = None 
     care_city: Optional[str] = None
-    care_state: Optional[str] = "MD"
+    care_state: Optional[str] = None
     care_zip: Optional[str] = None
 
     # SERVICE
-    branch_code: str = "mnhomecare" 
+    branch_code: Optional[str] = None 
     handled_by: Optional[str] = None
     agreement_date: Optional[date] = None
     start_date: Optional[date] = None
@@ -41,8 +41,8 @@ class AgreementBase(BaseModel):
     frequency_duration: Optional[str] = None
     care_type: str = "Home Care"
     is_live_in: bool = False
-    hourly_rate: float = 36.0
-    mileage_rate: float = 0.67
+    hourly_rate: Optional[float] = None
+    mileage_rate: Optional[float] = None
     
     # Additional service details
     vehicle_authorized: bool = False

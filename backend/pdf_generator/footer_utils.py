@@ -13,7 +13,13 @@ def get_header_tag(branch, care_state, page_num):
             return "GB"
         else:
             return branch[:2].upper()
-    return ""
+    # Smart fallback for new/custom branches — use MD dates as default
+    if page_num == 1:
+        return "MD 2019-09-16"
+    elif page_num == 2:
+        return "MD 2017-06-19"
+    else:
+        return "MD 2017-04-12"
 
 def get_footer_tag(branch, care_state, page_num):
     """Get footer tag (like MD 2019-09-16 in the example)"""
@@ -21,8 +27,11 @@ def get_footer_tag(branch, care_state, page_num):
     if page_num == 1:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
                        'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
-                       'lphomecare', 'lphomecare_staging', 'testhomecare']:
+                       'lphomecare', 'lphomecare_staging', 'testhomecare',
+                       'tomdhomecare', 'tomdhomecare_staging']:
             return "MD 2019-09-16"
+        elif branch in ['ciohhomecare', 'ciohhomecare_staging']:
+            return "CIOH 2019-09-16"
         elif branch in ['athomecare', 'athomecare_staging']:
             return "GA 2019-12-02"
         elif branch in ['scgahomecare', 'scgahomecare_staging']:
@@ -33,7 +42,7 @@ def get_footer_tag(branch, care_state, page_num):
             return "DCOH 09-16-2019"
         elif branch in ['dchomecare', 'dchomecare_staging'] and care_state != "DC":
             return "MD 2019-09-16"
-        elif branch in ['nvahomecare', 'nvahomecare_staging', 'rihomecare', 'rihomecare_staging']:
+        elif branch in ['nvahomecare', 'nvahomecare_staging', 'nvahomecarearchive', 'nvahomecarearchive_staging', 'rihomecare', 'rihomecare_staging']:
             return "VA 2019-09-16"
         elif branch in ['tahomecare', 'tahomecare_staging']:
             return "FL 2017-06-19"
@@ -82,8 +91,11 @@ def get_footer_tag(branch, care_state, page_num):
     elif page_num == 2:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
                        'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
-                       'lphomecare', 'lphomecare_staging', 'testhomecare']:
+                       'lphomecare', 'lphomecare_staging', 'testhomecare',
+                       'tomdhomecare', 'tomdhomecare_staging']:
             return "MD 2017-06-19"
+        elif branch in ['ciohhomecare', 'ciohhomecare_staging']:
+            return "CIOH 2017-06-19"
         elif branch in ['athomecare', 'athomecare_staging']:
             return "GA 2019-12-02"
         elif branch in ['scgahomecare', 'scgahomecare_staging']:
@@ -94,7 +106,7 @@ def get_footer_tag(branch, care_state, page_num):
             return "DCOH 06-19-2017"
         elif branch in ['dchomecare', 'dchomecare_staging'] and care_state != "DC":
             return "MD 2017-06-19"
-        elif branch in ['nvahomecare', 'nvahomecare_staging', 'rihomecare', 'rihomecare_staging']:
+        elif branch in ['nvahomecare', 'nvahomecare_staging', 'nvahomecarearchive', 'nvahomecarearchive_staging', 'rihomecare', 'rihomecare_staging']:
             return "VA 2017-06-19"
         elif branch in ['tahomecare', 'tahomecare_staging']:
             return "FL 2017-06-19"
@@ -144,8 +156,11 @@ def get_footer_tag(branch, care_state, page_num):
     elif page_num == 3:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
                        'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
-                       'lphomecare', 'lphomecare_staging', 'testhomecare']:
+                       'lphomecare', 'lphomecare_staging', 'testhomecare',
+                       'tomdhomecare', 'tomdhomecare_staging']:
             return "MD 2017-04-12"
+        elif branch in ['ciohhomecare', 'ciohhomecare_staging']:
+            return "CIOH - 2017-04-12"
         elif branch in ['athomecare', 'athomecare_staging']:
             return "GA 2019-12-03"
         elif branch in ['scgahomecare', 'scgahomecare_staging']:
@@ -156,7 +171,7 @@ def get_footer_tag(branch, care_state, page_num):
             return "DCOH - 08-08-2016"
         elif branch in ['dchomecare', 'dchomecare_staging'] and care_state != "DC":
             return "MD 2017-04-12"
-        elif branch in ['nvahomecare', 'nvahomecare_staging']:
+        elif branch in ['nvahomecare', 'nvahomecare_staging', 'nvahomecarearchive', 'nvahomecarearchive_staging']:
             return "NVA - 2017-04-12"
         elif branch in ['rihomecare', 'rihomecare_staging']:
             return "RIVA - 2017-04-12"
@@ -207,8 +222,11 @@ def get_footer_tag(branch, care_state, page_num):
     elif page_num == 4:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
                        'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
-                       'lphomecare', 'lphomecare_staging', 'testhomecare']:
+                       'lphomecare', 'lphomecare_staging', 'testhomecare',
+                       'tomdhomecare', 'tomdhomecare_staging']:
             return "MD 2017-04-12"
+        elif branch in ['ciohhomecare', 'ciohhomecare_staging']:
+            return "CIOH - 2017-04-12"
         elif branch in ['athomecare', 'athomecare_staging']:
             return "GA 2019-12-03"
         elif branch in ['scgahomecare', 'scgahomecare_staging']:
@@ -219,7 +237,7 @@ def get_footer_tag(branch, care_state, page_num):
             return "DCOH - 08-08-2016"
         elif branch in ['dchomecare', 'dchomecare_staging'] and care_state != "DC":
             return "MD 2017-04-12"
-        elif branch in ['nvahomecare', 'nvahomecare_staging']:
+        elif branch in ['nvahomecare', 'nvahomecare_staging', 'nvahomecarearchive', 'nvahomecarearchive_staging']:
             return "NVA - 2017-04-12"
         elif branch in ['rihomecare', 'rihomecare_staging']:
             return "RIVA - 2017-04-12"
@@ -269,9 +287,12 @@ def get_footer_tag(branch, care_state, page_num):
         
     elif page_num == 5:
         if branch in ['anhomecare', 'anhomecare_staging', 'bahomecare', 'bahomecare_staging', 
-                       'blhomecare', 'blhomecare_staging', 'fkhomecare', 'fkhomecare_staging', 
-                       'lphomecare', 'lphomecare_staging', 'testhomecare']:
+                       'blhomecare', 'blhomecare_styling', 'fkhomecare', 'fkhomecare_staging', 
+                       'lphomecare', 'lphomecare_staging', 'testhomecare',
+                       'tomdhomecare', 'tomdhomecare_staging']:
             return "MD 2017-04-12"
+        elif branch in ['ciohhomecare', 'ciohhomecare_staging']:
+            return "CIOH - 2017-04-12"
         elif branch in ['athomecare', 'athomecare_staging']:
             return "GA 2019-12-03"
         elif branch in ['scgahomecare', 'scgahomecare_staging']:
@@ -282,7 +303,7 @@ def get_footer_tag(branch, care_state, page_num):
             return "DCOH - 08-08-2016"
         elif branch in ['dchomecare', 'dchomecare_staging'] and care_state != "DC":
             return "MD 2017-04-12"
-        elif branch in ['nvahomecare', 'nvahomecare_staging']:
+        elif branch in ['nvahomecare', 'nvahomecare_staging', 'nvahomecarearchive', 'nvahomecarearchive_staging']:
             return "NVA - 2017-04-12"
         elif branch in ['rihomecare', 'rihomecare_staging']:
             return "RIVA - 2017-04-12"
@@ -330,4 +351,11 @@ def get_footer_tag(branch, care_state, page_num):
         elif branch in ['amfvahomecare', 'amfvahomecare_staging']:
             return "AMFVA - 2020-01-15"
     
-    return ""
+    
+    # Smart fallback for new/custom branches — use standard MD dates
+    if page_num == 1:
+        return "MD 2019-09-16"
+    elif page_num == 2:
+        return "MD 2017-06-19"
+    else:
+        return "MD 2017-04-12"

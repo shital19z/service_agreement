@@ -101,7 +101,7 @@ class Agreement(Base):
     clt_phone = Column(String, nullable=True)
     clt_address = Column(String, nullable=False)
     clt_city = Column(String, nullable=True)
-    clt_state = Column(String, default="MD")
+    clt_state = Column(String, nullable=True)
     clt_zip = Column(String, nullable=True)
     responsible_party = Column(String, nullable=True)
     clt_relationship = Column(String, nullable=True, default="Self")
@@ -113,7 +113,7 @@ class Agreement(Base):
     care_dob = Column(Date, nullable=True)
     care_recipient_address = Column(String, nullable=True)
     care_city = Column(String, nullable=True)
-    care_state = Column(String, default="MD")
+    care_state = Column(String, nullable=True)
     care_zip = Column(String, nullable=True)
 
     # SECTION 3: SERVICE
@@ -138,7 +138,7 @@ class Agreement(Base):
     is_live_in = Column(Boolean, default=False)
     
     # FIXED: Use custom NumericFloat type
-    hourly_rate = Column(NumericFloat, default=36.0)
+    hourly_rate = Column(NumericFloat, nullable=True)
     mileage_rate = Column(NumericFloat, default=0.67)
     
     status = Column(String, default="Pending")

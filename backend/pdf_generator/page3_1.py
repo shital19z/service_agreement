@@ -14,12 +14,11 @@ def generate_page3_1(data):
     
     html = '<div>'
     
-    # Logo header - MOVED TO RIGHT SIDE
+    # Logo header - LEFT SIDE to match dynamic_sa_page3_1.php
     html += f'''
     <table width="100%" style="font-size:11.5px; margin-bottom:50px;" cellpadding="0" cellspacing="0">
         <tr>
-            <td width="70%">&nbsp;</td>  <!-- Empty space on left -->
-            <td width="30%" align="right" style="padding-right:18px;">  <!-- Logo on right -->
+            <td style="padding-left:18px;">
                 <img style="width:2.0833in;height:0.9166in;" src="{logo_path}" />
             </td>
         </tr>
@@ -52,7 +51,17 @@ def generate_page3_1(data):
     '''
     
     # Second section - Initials and Insurance information
-    html += '''
+    # Dynamic: read consumer_notice_text from DB if saved via Edit Content.
+    # Fallback: hardcoded default insurance notice text.
+    consumer_notice_text = data.get('consumer_notice_text', '')
+    _default_consumer_notice = (
+        "I have been informed that Options For Senior America maintains general, professional liability, "
+        "and workers compensation insurance covering the direct care worker who is employed by Options "
+        "as an independent contractor."
+    )
+    insurance_text = consumer_notice_text or _default_consumer_notice
+
+    html += f'''
     <table width="100%" style="font-size:12pt; margin-top:25px;" cellpadding="0" cellspacing="0">
         <tr>
             <td style="padding-left:18px;" width="20%" valign="top">
@@ -60,7 +69,7 @@ def generate_page3_1(data):
                 <p style="text-align: center; font-weight:400; font-size: 11pt; font-family: Calibri; font-style: normal; margin:0;">Initials</p>
             </td>
             <td width="80%" valign="top">
-                <p style="text-align: left; font-weight:400; font-size: 11pt; font-family: Calibri; font-style: normal; margin:0; line-height:1.3;">I have been informed that Options For Senior America maintains general, professional liability, and workers compensation insurance covering the direct care worker who is employed by Options as an independent contractor.</p>                
+                <p style="text-align: left; font-weight:400; font-size: 11pt; font-family: Calibri; font-style: normal; margin:0; line-height:1.3;">{insurance_text}</p>
             </td>
         </tr>
     </table>

@@ -115,11 +115,9 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
             newErrors.branch_state = 'State must be 2 letters (e.g., MD, VA, GA)';
         }
         
-        // ZIP code validation
+        // ZIP code validation - accepts any format (US, international, etc.)
         if (!formData.zipcode.trim()) {
             newErrors.zipcode = 'ZIP code is required';
-        } else if (!/^\d{5}(-\d{4})?$/.test(formData.zipcode)) {
-            newErrors.zipcode = 'Enter a valid ZIP code (e.g., 12345 or 12345-6789)';
         }
         
         // Phone validation (optional but if provided, validate format)

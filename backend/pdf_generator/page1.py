@@ -39,7 +39,7 @@ def generate_page1(data):
         print(f"DEBUG - Setting default relationship to: '{clt_relationship}'")
     
     handled_by = data.get('handled_by', '')
-    perc_charged = data.get('PercCharged', '100')
+    perc_charged = data.get('perc_charged', data.get('PercCharged', '100'))
     
     # DEBUG: Print relationship value
     print(f"DEBUG - Page 1 - Relationship value after fix: '{clt_relationship}'")
@@ -220,14 +220,19 @@ def generate_page1(data):
         </table>
         '''
     
-    # Required Services - UPDATED to use required_services field
-    blank_div = '<div style="height:2px"> &nbsp; </div>'
-    req_services = required_services or care_type or blank_div  # UPDATED
-    
+    # Required Services - FULLY DYNAMIC from branch template
+    # required_services from Edit Content replaces the entire intro paragraph.
+    # If empty, falls back to the original default text.
+    _default_req_services = (
+        "In addition to the general services that our caregivers provide such as assistance with activities of "
+        "daily living, meal preparation, light housekeeping, and laundry, the required services as stated by "
+        "the responsible party/client are:"
+    )
+    req_intro = required_services if required_services and required_services.strip() else _default_req_services
+
     html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:</p>
-            <p style="margin:1px 0;">{req_services}</p>
+            <p style="margin:1px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; {req_intro}</p>
         </div>
         
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
@@ -286,17 +291,23 @@ def generate_page1(data):
         </div>
     '''
     
-    # Federal holidays with 12-day logic for mnhomecare (from PHP)
-    if branch in ['mnhomecare', 'mnhomecare_staging']:
+    # Federal holidays - read holiday_count from DB (branch_content), fall back to branch check
+    # holiday_count is saved via Edit Content and passed in data by main.py
+    holiday_count = int(data.get('holiday_count', 0))
+    if holiday_count == 0:
+        # Fallback: mnhomecare has always used 12 holidays
+        holiday_count = 12 if branch in ['mnhomecare', 'mnhomecare_staging'] else 11
+
+    if holiday_count >= 12:
         html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 12 holidays as follows: New Year's Day, Martin Luther King Day, Presidents' Day, Easter Sunday, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans' Day, Thanksgiving Day, and Christmas Day.</p>
+            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 12 holidays as follows: New Year\'s Day, Martin Luther King Day, Presidents\' Day, Easter Sunday, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans\' Day, Thanksgiving Day, and Christmas Day.</p>
         </div>
         '''
     else:
         html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 11 holidays as follows: New Year's Day, Martin Luther King Day, Presidents' Day, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans' Day, Thanksgiving Day, and Christmas Day.</p>
+            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 11 holidays as follows: New Year\'s Day, Martin Luther King Day, Presidents\' Day, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans\' Day, Thanksgiving Day, and Christmas Day.</p>
         </div>
         '''
     
@@ -414,9 +425,35 @@ def generate_page1(data):
 
 
 def get_office_address(branch, data):
-    """Get office address based on branch (from PHP)"""
+    """
+    Get office address based on branch.
+    Priority:
+      1. Dynamic data from DB (street/city/state/zipcode/phone/fax)
+         injected into data by main.py when it fetches the branch record.
+      2. Hardcoded lookup table - keeps all existing branches working unchanged.
+      3. Corporate default for anything not in the lookup.
+    """
     branch_lower = branch.lower()
-    
+
+    # 1. Dynamic path: use DB fields if present
+    street  = data.get('address_line_1', '') or data.get('street', '')
+    city    = data.get('city', '')
+    state   = data.get('state_code', '') or data.get('branch_state', '')
+    zipcode = data.get('zip_code', '') or data.get('zipcode', '')
+    phone   = data.get('tel', '') or data.get('branch_phone', '')
+    fax     = data.get('fax', '') or data.get('branch_fax', '')
+    office  = data.get('office_name', '') or 'Options For Senior America'
+
+    if street and city and state:
+        addr  = f'{office}<br>{street}<br>{city}, {state} {zipcode}'.strip(', ')
+        addr += '<br>_______________________________'
+        if phone:
+            addr += f'<br>Tel: {phone}'
+        if fax:
+            addr += f'<br>Fax: {fax}'
+        return addr
+
+    # 2. Hardcoded lookup (all existing branches)
     # Special cases with unique addresses
     if branch_lower in ['scgahomecare', 'scgahomecare_staging']:
         return '2110 Powers Ferry Rd <br>Suite 306 <br>Atlanta, GA 30339<br>_______________________________<br>Tel: 404.634.1111 <br>Fax: 404.634.1199'

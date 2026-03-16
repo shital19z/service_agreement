@@ -89,7 +89,17 @@ def generate_page2(data):
     """
     # Get values directly from data
     branch = data.get('branch_code', '').lower()
-    care_state = data.get('care_state', '').upper()
+    care_state = data.get('care_state')
+    if care_state is None:
+      care_state = ''
+    care_state = care_state.upper()
+
+    # ── Dynamic content from Edit Content (branch template) ──────────────
+    patients_rights_custom = data.get('patients_rights_text', '').strip() if data.get('patients_rights_text') else ''
+    complaint_proc_custom  = data.get('complaint_procedures_text', '').strip() if data.get('complaint_procedures_text') else ''
+    billing_proc_custom    = data.get('billing_procedures_text', '').strip() if data.get('billing_procedures_text') else ''
+    # ─────────────────────────────────────────────────────────────────────
+
         # ===== CRITICAL DEBUG =====
     print("\n" + "="*60)
     print("DEBUG - Page 2 Branch Detection")
@@ -634,27 +644,98 @@ def generate_page2(data):
             </ol>
             '''
     
-    # ===== DEFAULT to MD/NJ template if no match (shouldn't happen) =====
+    # ===== DEFAULT — branch not in any list: use standard MD template =====
+    else:
+        top_margin = "0px"
+        office_num = "410.224.2700 for Annapolis, 410.448.1100 for Baltimore, 410.893.9914 for Bel Air, 301.562.3100 for Bethesda, 301.624.5630 for Frederick, and 301.392.1387 for La Plata"
+        md_hotline = f'<li style="margin-bottom:{list_margin};">You may write to Barbara Fagan, Survey Coordinator, Office of Health Care Quality, Bland Bryant Building, Spring Grove Hospital Center, 55 Wade Avenue, Catonsville, MD 21228, or you may call the State of Maryland Residential Service Agency Hotline at 1-877-4MD-DHMH.</li>'
+
+        if patients_rights_custom:
+            html += f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;"><b><u>Notice of Patients\' Rights and Responsibilities</u></b></p>'
+            html += f'<p style="font-size:{base_font_size};margin:{section_margin} 0;">{patients_rights_custom}</p>'
+            if complaint_proc_custom:
+                html += f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;"><b><u>Notice of Complaint Procedures</u></b></p>'
+                html += f'<p style="font-size:{base_font_size};margin:{section_margin} 0;">{complaint_proc_custom}</p>'
+        else:
+            html += (
+                f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;"><b><u>Notice of Patients\' Rights and Responsibilities</u></b></p>'
+                f'<ol class="main-list" style="padding-left:{list_padding};margin:0;list-style-type:decimal;">'
+                f'<li style="margin-bottom:{list_margin};">A client, or the client representative with legal authority to make health care decisions, has the right to:'
+                f'<ol class="alpha-list" style="padding-left:14px;margin:0;list-style-type:lower-alpha;">'
+                f'<li style="margin-bottom:{list_margin};">Be treated with consideration, respect, and full recognition of the client dignity and individuality</li>'
+                f'<li style="margin-bottom:{list_margin};">Receive treatment, care, and services that are adequate, appropriate, and in compliance with relevant State, local, and federal laws and regulations</li>'
+                f'<li style="margin-bottom:{list_margin};">Participate in the development of the client care plan and medical treatment</li>'
+                f'<li style="margin-bottom:{list_margin};">Refuse treatment after the possible consequences of refusing treatment have been fully explained</li>'
+                f'<li style="margin-bottom:{list_margin};">Privacy</li>'
+                f'<li style="margin-bottom:{list_margin};">Be free from mental, verbal, sexual, and physical abuse, neglect, involuntary seclusion, and exploitation</li>'
+                f'<li style="margin-bottom:{list_margin};">Confidentiality</li>'
+                f'</ol></li>'
+                f'<li style="margin-bottom:{list_margin};">A client or client representative has the right to:'
+                f'<ol class="alpha-list" style="padding-left:14px;margin:0;list-style-type:lower-alpha;">'
+                f'<li style="margin-bottom:{list_margin};">Make suggestions or complaints, or present grievances on behalf of the client to the agency, government agencies, or other persons without the threat or fear of retaliation</li>'
+                f'<li style="margin-bottom:{list_margin};">Receive a prompt response, through an established complaint or grievance procedure, to any complaints, suggestions, or grievances the participant may have</li>'
+                f'</ol></li>'
+                f'{md_hotline}'
+                f'<li style="margin-bottom:{list_margin};">A client or client representative has the responsibility to:'
+                f'<ol class="alpha-list" style="padding-left:14px;margin:0;list-style-type:lower-alpha;">'
+                f'<li style="margin-bottom:{list_margin};">Advise the Options office of any changes in the care recipient condition, or of any events that affect the care recipient service needs.</li>'
+                f'<li style="margin-bottom:{list_margin};">Treat the Options caregivers with respect.</li>'
+                f'<li style="margin-bottom:{list_margin};">Pay Options invoices in a timely manner as indicated below under the Notice of Billing Procedures section.</li>'
+                f'</ol></li></ol>'
+                f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;margin-top:{top_margin};"><b><u>Notice of Complaint Procedures</u></b></p>'
+                f'<ol class="main-list" style="padding-left:{list_padding};margin:0;list-style-type:decimal;">'
+                f'<li style="margin-bottom:{list_margin};">Please be advised that at OPTIONS, the person responsible for complaints intake and acknowledgement of complaints is the Community Relations Manager. Their office number is {office_num}</li>'
+                f'<li style="margin-bottom:{list_margin};">OPTIONS has in place a system for logging receipt of complaints, investigation, and resolution of complaints.</li>'
+                f'<li style="margin-bottom:{list_margin};">The OPTIONS employee who will be responsible for investigating complaints is the Community Relations Manager or the Care Manager.</li>'
+                f'<li style="margin-bottom:{list_margin};">OPTIONS will produce a written record of the findings of each complaint investigated.</li>'
+                f'<li style="margin-bottom:{list_margin};">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Manager.</li>'
+                f'<li style="margin-bottom:{list_margin};">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient property.</li>'
+                f'<li style="margin-bottom:{list_margin};">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>'
+                f'<li style="margin-bottom:{list_margin};">If you are not satisfied with the proposed resolution, you may appeal to an agency Director at 1-800-2-OPTIONS, or in writing to OPTIONS Director, 555 Quince Orchard Road, Suite 240, Gaithersburg, MD 20878, in which case they would review the case and get back to you in writing within 21 days of receipt of the appeal.</li>'
+                f'</ol>'
+            )
+
+        # ===== NOTICE OF BILLING PROCEDURES =====
+    # ✅ KEY FIX: Use table-based layout instead of <ol><li> because xhtml2pdf
+    # collapses list items with margin-bottom:0 into one run-on paragraph.
+    # Tables always render each row on its own line regardless of content category.
+    billing_font = "7.5px"   # Slightly larger than base for readability
+    billing_row_padding = "3px 4px"
+
+    if billing_proc_custom:
+        html += f'''
+    <p style="font-size:{title_font_size};text-align:center;margin:{billing_margin} 0 4px 0;"><b><u>Notice of Billing Procedures</u></b></p>
+    <p style="font-size:{billing_font};margin:0;line-height:1.4;">{billing_proc_custom}</p>
+    '''
     else:
         html += f'''
-        <p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;"><b><u>Notice of Patients’ Rights and Responsibilities</u></b></p>
-        <p style="font-size:{base_font_size};text-align:left;margin:{section_margin} 0;">Default template - please contact administrator.</p>
-        '''
-    
-    # ===== NOTICE OF BILLING PROCEDURES (for ALL branches) =====
-    html += f'''
-    <p style="font-size:{title_font_size};text-align:center;margin:{billing_margin} 0;"><b><u>Notice of Billing Procedures</u></b></p>
-    <p style="font-size:{base_font_size};margin:{billing_margin} 0;">BILLING, BILLING ERRORS AND REFUNDS ARE TREATED AS FOLLOWS:</p>
-    <ol type="1" style="padding-left: 10px;margin:{billing_margin} 0;">
-        <li style="margin-bottom:{list_margin};"><u>Billing Method:</u> &nbsp;OPTIONS is a long-term home care agency, and billing is done, by way of invoices, on a weekly or bi-weekly basis. Given that billing is typically done after services are provided, invoices are due upon receipt.</li>
-        <li style="margin-bottom:{list_margin};"><u>When Payers are Insurance Companies or Third Parties:</u> &nbsp;OPTIONS typically seeks to obtain an "Assignment of Benefits" form from the care recipient or their designees, and OPTIONS then invoices the third party, copying the care recipient or their designees with all invoices sent to the third party.</li>
-        <li style="margin-bottom:{list_margin};"><u>Patient Notification of Changes in Fees and Charges:</u> &nbsp;We endeavor to notify the care recipient or their designees in writing of any changes in fees or charges, at least two (2) weeks ahead of the effective date of the new changes. Rate increases typically occur following each 12 months of service.</li>
-        <li style="margin-bottom:{list_margin};"><u>Correction of Billing Errors and Refund Policy:</u> &nbsp;Billing errors will be corrected in subsequent invoices. All refunds are either credited to the care recipient\'s account if it is an ongoing case, or are paid back to the care recipient.</li>
-        <li style="margin-bottom:{list_margin};"><u>Collection of Delinquent Care Recipient Accounts:</u> &nbsp;Any account more than 30 days past due shall be subject to interest charges of 1 ½ % per month (18% annual) from the invoice due date. If it becomes necessary to refer your account to an attorney for collection, you will be responsible for court costs and attorney\'s fees of no less than 1/3 (33.33%) of the principal balance, in addition to the interest charges listed above.</li>
-    </ol>
+    <p style="font-size:{title_font_size};text-align:center;margin:{billing_margin} 0 4px 0;"><b><u>Notice of Billing Procedures</u></b></p>
+    <p style="font-size:{billing_font};margin:0 0 4px 0;line-height:1.3;font-weight:bold;">BILLING, BILLING ERRORS AND REFUNDS ARE TREATED AS FOLLOWS:</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0;border-collapse:collapse;">
+        <tr valign="top">
+            <td width="18px" style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;">1.</td>
+            <td style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;"><u>Billing Method:</u> &nbsp;OPTIONS is a long-term home care agency, and billing is done, by way of invoices, on a weekly or bi-weekly basis. Given that billing is typically done after services are provided, invoices are due upon receipt.</td>
+        </tr>
+        <tr valign="top">
+            <td width="18px" style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;">2.</td>
+            <td style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;"><u>When Payers are Insurance Companies or Third Parties:</u> &nbsp;OPTIONS typically seeks to obtain an "Assignment of Benefits" form from the care recipient or their designees, and OPTIONS then invoices the third party, copying the care recipient or their designees with all invoices sent to the third party.</td>
+        </tr>
+        <tr valign="top">
+            <td width="18px" style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;">3.</td>
+            <td style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;"><u>Patient Notification of Changes in Fees and Charges:</u> &nbsp;We endeavor to notify the care recipient or their designees in writing of any changes in fees or charges, at least two (2) weeks ahead of the effective date of the new changes. Rate increases typically occur following each 12 months of service.</td>
+        </tr>
+        <tr valign="top">
+            <td width="18px" style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;">4.</td>
+            <td style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;"><u>Correction of Billing Errors and Refund Policy:</u> &nbsp;Billing errors will be corrected in subsequent invoices. All refunds are either credited to the care recipient's account if it is an ongoing case, or are paid back to the care recipient.</td>
+        </tr>
+        <tr valign="top">
+            <td width="18px" style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;">5.</td>
+            <td style="font-size:{billing_font};padding:{billing_row_padding};line-height:1.4;"><u>Collection of Delinquent Care Recipient Accounts:</u> &nbsp;Any account more than 30 days past due shall be subject to interest charges of 1 ½ % per month (18% annual) from the invoice due date. If it becomes necessary to refer your account to an attorney for collection, you will be responsible for court costs and attorney's fees of no less than 1/3 (33.33%) of the principal balance, in addition to the interest charges listed above.</td>
+        </tr>
+    </table>
     '''
-    
-    # ===== FLEXIBLE SPACER for short/medium content =====
+
+        # ===== FLEXIBLE SPACER for short/medium content =====
     if use_flex_spacer:
         html += '<div style="flex: 1;"></div>'
     

@@ -1,54 +1,18 @@
+// frontend/src/components/BranchContentEditor.jsx
 import React, { useState, useEffect } from 'react';
 import { endpoint } from '../resource/Constant';
 
 const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branchName }) => {
-    const [activeTab, setActiveTab] = useState('page1');
+    const [content, setContent] = useState({});
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    
-    const [content, setContent] = useState({
-        // Page 1
-        required_services: '',
-        freq_of_visit: '',
-        hazards: '',
-        charges_text: '',
-        payment_obligations_text: '',
-        live_in_text: '',
-        holiday_count: 11,
-        holidays_list: [],
-        
-        // Page 1 Cont
-        needs_assessment_text: '',
-        valuables_text: '',
-        notice_period_text: '',
-        cannot_hire_text: '',
-        record_keeping_text: '',
-        mileage_reimbursement_text: '',
-        vehicle_use_text: '',
-        general_provisions: [],
-        
-        // Page 2
-        patients_rights_text: '',
-        complaint_procedures_text: '',
-        billing_procedures_text: '',
-        
-        // Page 3
-        eft_authorization_text: '',
-        
-        // Settings
-        has_initial_contact: false,
-        requires_consumer_notice: false,
-        care_type: 'Home Care',
-        mileage_rate: 0.67,
-        hourly_rate: 36.00,
-        perc_charged: '100'
-    });
+    const [activeTab, setActiveTab] = useState('page1');
+    const [saveSuccess, setSaveSuccess] = useState(false);
 
     useEffect(() => {
         if (isOpen && branchCode) {
             fetchContent();
+            setSaveSuccess(false);
         }
     }, [isOpen, branchCode]);
 
@@ -59,19 +23,25 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
-            setContent(prev => ({ ...prev, ...data }));
-        } catch (err) {
-            setError('Failed to load content');
+            setContent(data);
+        } catch (error) {
+            console.error('Error fetching content:', error);
         } finally {
             setLoading(false);
         }
     };
 
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setContent(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
     const handleSave = async () => {
         setSaving(true);
-        setError('');
-        setSuccess('');
-        
+        setSaveSuccess(false);
         try {
             const response = await fetch(`${endpoint}/branches/${branchCode}/content`, {
                 method: 'PUT',
@@ -83,17 +53,18 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
             });
             
             if (response.ok) {
-                setSuccess('Content saved successfully!');
+                setSaveSuccess(true);
                 setTimeout(() => {
+                    alert('✅ Template saved successfully! This content will now auto-populate new agreements for this branch.');
                     onSave();
                     onClose();
-                }, 1500);
+                }, 500);
             } else {
-                const data = await response.json();
-                setError(data.detail || 'Failed to save');
+                alert('❌ Failed to save content');
             }
-        } catch (err) {
-            setError('Failed to connect to server');
+        } catch (error) {
+            console.error('Error saving content:', error);
+            alert('❌ Error saving content');
         } finally {
             setSaving(false);
         }
@@ -103,430 +74,595 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '900px', maxHeight: '90vh', overflow: 'hidden' }}>
+            <div className="modal-content" style={{ maxWidth: '900px', width: '95%', maxHeight: '90vh' }}>
                 <div className="modal-header">
-                    <h3>Edit Content: {branchName}</h3>
-                    <button onClick={onClose} className="modal-close">×</button>
+                    <h3>
+                        <span style={{ marginRight: '8px' }}>📋</span>
+                        Edit Branch Template: {branchName}
+                    </h3>
+                    <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
-                {loading ? (
-                    <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
-                ) : (
-                    <>
-                        {/* Tab Navigation */}
-                        <div style={{ 
-                            display: 'flex', 
-                            gap: '2px', 
-                            padding: '0 20px',
-                            borderBottom: '2px solid #e2e8f0',
-                            background: '#f8fafc'
-                        }}>
-                            <TabButton 
-                                active={activeTab === 'page1'} 
-                                onClick={() => setActiveTab('page1')}
-                            >
-                                Page 1
-                            </TabButton>
-                            <TabButton 
-                                active={activeTab === 'page1cont'} 
-                                onClick={() => setActiveTab('page1cont')}
-                            >
-                                Page 1 Cont
-                            </TabButton>
-                            <TabButton 
-                                active={activeTab === 'page2'} 
-                                onClick={() => setActiveTab('page2')}
-                            >
-                                Page 2 - Rights
-                            </TabButton>
-                            <TabButton 
-                                active={activeTab === 'page3'} 
-                                onClick={() => setActiveTab('page3')}
-                            >
-                                Page 3 - EFT
-                            </TabButton>
-                            <TabButton 
-                                active={activeTab === 'settings'} 
-                                onClick={() => setActiveTab('settings')}
-                            >
-                                Settings
-                            </TabButton>
+                {/* Info Banner */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%)',
+                    borderLeft: '4px solid #4facfe',
+                    padding: '12px 20px',
+                    margin: '0 20px 10px 20px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    color: '#0369a1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                }}>
+                    <span style={{ fontSize: '20px' }}>ℹ️</span>
+                    <span>
+                        <strong>Template Content:</strong> This content will auto-populate new agreements when this branch is selected. 
+                        Fields marked with <span style={{ color: '#4facfe', fontWeight: 'bold' }}>✨</span> directly affect agreement generation.
+                    </span>
+                </div>
+
+                <div className="modal-body" style={{ maxHeight: 'calc(90vh - 160px)', overflowY: 'auto', padding: '20px' }}>
+                    {/* Tab Navigation */}
+                    <div style={{ display: 'flex', borderBottom: '2px solid #e2e8f0', marginBottom: '20px', flexWrap: 'wrap' }}>
+                        <TabButton active={activeTab === 'page1'} onClick={() => setActiveTab('page1')}>
+                            Page 1 <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
+                        </TabButton>
+                        <TabButton active={activeTab === 'page1cont'} onClick={() => setActiveTab('page1cont')}>
+                            Page 1 Cont <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
+                        </TabButton>
+                        <TabButton active={activeTab === 'page2'} onClick={() => setActiveTab('page2')}>
+                            Page 2 <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
+                        </TabButton>
+                        <TabButton active={activeTab === 'page3'} onClick={() => setActiveTab('page3')}>
+                            Page 3 <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
+                        </TabButton>
+                        <TabButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>
+                            Settings
+                        </TabButton>
+                    </div>
+
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '40px' }}>
+                            <div style={{ 
+                                width: '40px', 
+                                height: '40px', 
+                                border: '3px solid #e2e8f0',
+                                borderTopColor: '#4facfe',
+                                borderRadius: '50%',
+                                animation: 'spin 1s linear infinite',
+                                margin: '0 auto 15px auto'
+                            }}></div>
+                            Loading template content...
                         </div>
-
-                        {/* Scrollable Content Area */}
-                        <div style={{ 
-                            padding: '20px', 
-                            maxHeight: 'calc(90vh - 180px)', 
-                            overflowY: 'auto' 
-                        }}>
-                            {error && (
-                                <div style={{ 
-                                    background: '#fee2e2', 
-                                    color: '#991b1b',
-                                    padding: '12px',
-                                    borderRadius: '6px',
-                                    marginBottom: '20px'
-                                }}>
-                                    {error}
-                                </div>
-                            )}
-                            
-                            {success && (
-                                <div style={{ 
-                                    background: '#dcfce7', 
-                                    color: '#166534',
-                                    padding: '12px',
-                                    borderRadius: '6px',
-                                    marginBottom: '20px'
-                                }}>
-                                    {success}
-                                </div>
-                            )}
-
-                            {/* Page 1 Content */}
+                    ) : (
+                        <>
+                            {/* PAGE 1 TAB */}
                             {activeTab === 'page1' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '20px' }}>Page 1 - Service Agreement</h4>
+                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
+                                        Page 1 - Main Agreement 
+                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
+                                            (These fields auto-fill in new agreements)
+                                        </span>
+                                    </h4>
                                     
-                                    <Section label="Required Services">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Required Services Introduction
+                                        </label>
                                         <textarea
-                                            value={content.required_services}
-                                            onChange={(e) => setContent({...content, required_services: e.target.value})}
-                                            rows={4}
-                                            style={textareaStyle}
-                                            placeholder="Enter required services description..."
+                                            name="required_services"
+                                            value={content.required_services || ''}
+                                            onChange={handleChange}
+                                            rows="4"
+                                            className="form-input"
+                                            placeholder="Enter the required services introduction text..."
                                         />
-                                    </Section>
+                                        <small style={{ color: '#64748b' }}>This text appears in the REQUIRED SERVICES section</small>
+                                    </div>
 
-                                    <Section label="Frequency of Visits">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Frequency of Visits (placeholder)
+                                        </label>
                                         <input
                                             type="text"
-                                            value={content.freq_of_visit}
-                                            onChange={(e) => setContent({...content, freq_of_visit: e.target.value})}
-                                            style={inputStyle}
+                                            name="freq_of_visit"
+                                            value={content.freq_of_visit || ''}
+                                            onChange={handleChange}
+                                            className="form-input"
                                             placeholder="e.g., Daily, Weekly, Mon-Fri"
                                         />
-                                    </Section>
+                                        <small style={{ color: '#64748b' }}>Default text for FREQUENCY DURATION OF VISITS</small>
+                                    </div>
 
-                                    <Section label="Hazards">
-                                        <textarea
-                                            value={content.hazards}
-                                            onChange={(e) => setContent({...content, hazards: e.target.value})}
-                                            rows={2}
-                                            style={textareaStyle}
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Hazards (placeholder)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="hazards"
+                                            value={content.hazards || ''}
+                                            onChange={handleChange}
+                                            className="form-input"
                                             placeholder="None Reported"
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Charges Text">
-                                        <textarea
-                                            value={content.charges_text}
-                                            onChange={(e) => setContent({...content, charges_text: e.target.value})}
-                                            rows={3}
-                                            style={textareaStyle}
-                                            placeholder="We bill bi-weekly for services rendered..."
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label>Care Type</label>
+                                        <input
+                                            type="text"
+                                            name="care_type"
+                                            value={content.care_type || 'Home Care'}
+                                            onChange={handleChange}
+                                            className="form-input"
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Payment Obligations">
-                                        <textarea
-                                            value={content.payment_obligations_text}
-                                            onChange={(e) => setContent({...content, payment_obligations_text: e.target.value})}
-                                            rows={3}
-                                            style={textareaStyle}
-                                        />
-                                    </Section>
+                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                                        <div className="form-group">
+                                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                                Hourly Rate ($)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="hourly_rate"
+                                                value={content.hourly_rate || 36.00}
+                                                onChange={handleChange}
+                                                step="0.01"
+                                                className="form-input"
+                                            />
+                                        </div>
 
-                                    <Section label="Live-in Services Text">
-                                        <textarea
-                                            value={content.live_in_text}
-                                            onChange={(e) => setContent({...content, live_in_text: e.target.value})}
-                                            rows={4}
-                                            style={textareaStyle}
-                                        />
-                                    </Section>
+                                        <div className="form-group">
+                                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                                Mileage Rate ($/mile)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="mileage_rate"
+                                                value={content.mileage_rate || 0.67}
+                                                onChange={handleChange}
+                                                step="0.01"
+                                                className="form-input"
+                                            />
+                                        </div>
+                                    </div>
 
-                                    <Section label="Holiday Count">
+                                    <div className="form-group">
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Percentage Charged (%)
+                                        </label>
                                         <input
                                             type="number"
-                                            value={content.holiday_count}
-                                            onChange={(e) => setContent({...content, holiday_count: parseInt(e.target.value)})}
-                                            style={{...inputStyle, width: '100px'}}
+                                            name="perc_charged"
+                                            value={content.perc_charged || '100'}
+                                            onChange={handleChange}
                                             min="0"
-                                            max="15"
+                                            max="100"
+                                            className="form-input"
                                         />
-                                    </Section>
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Page 1 Cont Content */}
+                            {/* PAGE 1 CONT TAB */}
                             {activeTab === 'page1cont' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '20px' }}>Page 1 - Continuation</h4>
+                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
+                                        Page 1 Continuation - Additional Terms
+                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
+                                            (These fields auto-fill in new agreements)
+                                        </span>
+                                    </h4>
                                     
-                                    <Section label="Needs Assessment Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Notice Period Text
+                                        </label>
                                         <textarea
-                                            value={content.needs_assessment_text}
-                                            onChange={(e) => setContent({...content, needs_assessment_text: e.target.value})}
-                                            rows={3}
-                                            style={textareaStyle}
+                                            name="notice_period_text"
+                                            value={content.notice_period_text || ''}
+                                            onChange={handleChange}
+                                            rows="4"
+                                            className="form-input"
+                                            placeholder="e.g. OPTIONS may end services by giving 3 calendar days notice in writing..."
                                         />
-                                    </Section>
+                                        <small style={{ color: '#64748b' }}>Leave blank to use the default for this branch type (3-day or 10-day)</small>
+                                    </div>
 
-                                    <Section label="Valuables Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Needs Assessment & Plan of Care
+                                        </label>
                                         <textarea
-                                            value={content.valuables_text}
-                                            onChange={(e) => setContent({...content, valuables_text: e.target.value})}
-                                            rows={3}
-                                            style={textareaStyle}
+                                            name="needs_assessment_text"
+                                            value={content.needs_assessment_text || ''}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="form-input"
+                                            placeholder="Enter needs assessment text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Notice Period Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Your Valuables
+                                        </label>
                                         <textarea
-                                            value={content.notice_period_text}
-                                            onChange={(e) => setContent({...content, notice_period_text: e.target.value})}
-                                            rows={3}
-                                            style={textareaStyle}
+                                            name="valuables_text"
+                                            value={content.valuables_text || ''}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="form-input"
+                                            placeholder="Enter valuables text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Cannot Hire Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Medication Administration
+                                        </label>
                                         <textarea
-                                            value={content.cannot_hire_text}
-                                            onChange={(e) => setContent({...content, cannot_hire_text: e.target.value})}
-                                            rows={4}
-                                            style={textareaStyle}
+                                            name="medication_text"
+                                            value={content.medication_text || ''}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="form-input"
+                                            placeholder="Enter medication text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Record Keeping Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Cannot Be Hired
+                                        </label>
                                         <textarea
-                                            value={content.record_keeping_text}
-                                            onChange={(e) => setContent({...content, record_keeping_text: e.target.value})}
-                                            rows={4}
-                                            style={textareaStyle}
+                                            name="cannot_hire_text"
+                                            value={content.cannot_hire_text || ''}
+                                            onChange={handleChange}
+                                            rows="6"
+                                            className="form-input"
+                                            placeholder="Enter cannot be hired text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Mileage Reimbursement Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Record Keeping
+                                        </label>
                                         <textarea
-                                            value={content.mileage_reimbursement_text}
-                                            onChange={(e) => setContent({...content, mileage_reimbursement_text: e.target.value})}
-                                            rows={3}
-                                            style={textareaStyle}
+                                            name="record_keeping_text"
+                                            value={content.record_keeping_text || ''}
+                                            onChange={handleChange}
+                                            rows="4"
+                                            className="form-input"
+                                            placeholder="Enter record keeping text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Vehicle Use Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Mileage Reimbursement
+                                        </label>
                                         <textarea
-                                            value={content.vehicle_use_text}
-                                            onChange={(e) => setContent({...content, vehicle_use_text: e.target.value})}
-                                            rows={2}
-                                            style={textareaStyle}
+                                            name="mileage_reimbursement_text"
+                                            value={content.mileage_reimbursement_text || ''}
+                                            onChange={handleChange}
+                                            rows="3"
+                                            className="form-input"
+                                            placeholder="Enter mileage reimbursement text..."
                                         />
-                                    </Section>
+                                    </div>
+
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Use of Family Vehicle
+                                        </label>
+                                        <textarea
+                                            name="vehicle_use_text"
+                                            value={content.vehicle_use_text || ''}
+                                            onChange={handleChange}
+                                            rows="2"
+                                            className="form-input"
+                                            placeholder="Enter vehicle use text..."
+                                        />
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Page 2 Content */}
+                            {/* PAGE 2 TAB */}
                             {activeTab === 'page2' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '20px' }}>Page 2 - Patient Rights & Procedures</h4>
+                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
+                                        Page 2 - Patient Rights & Billing
+                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
+                                            (These fields auto-fill in new agreements)
+                                        </span>
+                                    </h4>
                                     
-                                    <Section label="Patients Rights Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Patients' Rights Text
+                                        </label>
                                         <textarea
-                                            value={content.patients_rights_text}
-                                            onChange={(e) => setContent({...content, patients_rights_text: e.target.value})}
-                                            rows={6}
-                                            style={textareaStyle}
+                                            name="patients_rights_text"
+                                            value={content.patients_rights_text || ''}
+                                            onChange={handleChange}
+                                            rows="12"
+                                            className="form-input"
+                                            placeholder="Enter patients' rights text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Complaint Procedures Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Complaint Procedures Text
+                                        </label>
                                         <textarea
-                                            value={content.complaint_procedures_text}
-                                            onChange={(e) => setContent({...content, complaint_procedures_text: e.target.value})}
-                                            rows={6}
-                                            style={textareaStyle}
+                                            name="complaint_procedures_text"
+                                            value={content.complaint_procedures_text || ''}
+                                            onChange={handleChange}
+                                            rows="10"
+                                            className="form-input"
+                                            placeholder="Enter complaint procedures text..."
                                         />
-                                    </Section>
+                                    </div>
 
-                                    <Section label="Billing Procedures Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Billing Procedures Text
+                                        </label>
                                         <textarea
-                                            value={content.billing_procedures_text}
-                                            onChange={(e) => setContent({...content, billing_procedures_text: e.target.value})}
-                                            rows={6}
-                                            style={textareaStyle}
+                                            name="billing_procedures_text"
+                                            value={content.billing_procedures_text || ''}
+                                            onChange={handleChange}
+                                            rows="12"
+                                            className="form-input"
+                                            placeholder="Enter billing procedures text..."
                                         />
-                                    </Section>
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Page 3 Content */}
+                            {/* PAGE 3 TAB */}
                             {activeTab === 'page3' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '20px' }}>Page 3 - EFT Authorization</h4>
+                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
+                                        Page 3 - EFT Authorization
+                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
+                                            (These fields auto-fill in new agreements)
+                                        </span>
+                                    </h4>
                                     
-                                    <Section label="EFT Authorization Text">
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            EFT Authorization Text
+                                        </label>
                                         <textarea
-                                            value={content.eft_authorization_text}
-                                            onChange={(e) => setContent({...content, eft_authorization_text: e.target.value})}
-                                            rows={6}
-                                            style={textareaStyle}
+                                            name="eft_authorization_text"
+                                            value={content.eft_authorization_text || ''}
+                                            onChange={handleChange}
+                                            rows="15"
+                                            className="form-input"
+                                            placeholder="Enter EFT authorization text..."
                                         />
-                                    </Section>
+                                    </div>
+
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
+                                            Consumer Notice Text (Page 3.1)
+                                        </label>
+                                        <textarea
+                                            name="consumer_notice_text"
+                                            value={content.consumer_notice_text || ''}
+                                            onChange={handleChange}
+                                            rows="8"
+                                            className="form-input"
+                                            placeholder="Enter consumer notice text..."
+                                        />
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Settings Tab */}
+                            {/* SETTINGS TAB */}
                             {activeTab === 'settings' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '20px' }}>Branch Settings</h4>
+                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
+                                        Branch Settings
+                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
+                                            (These affect validation and behavior)
+                                        </span>
+                                    </h4>
                                     
-                                    <div style={gridStyle}>
-                                        <Section label="Hourly Rate ($)">
+                                    <div className="form-group" style={{ marginBottom: '20px', background: '#f8fafc', padding: '15px', borderRadius: '8px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
                                             <input
-                                                type="number"
-                                                value={content.hourly_rate}
-                                                onChange={(e) => setContent({...content, hourly_rate: parseFloat(e.target.value)})}
-                                                style={inputStyle}
-                                                step="0.01"
-                                                min="0"
+                                                type="checkbox"
+                                                name="has_initial_contact"
+                                                checked={content.has_initial_contact || false}
+                                                onChange={handleChange}
+                                                style={{ width: '18px', height: '18px' }}
                                             />
-                                        </Section>
-
-                                        <Section label="Mileage Rate ($)">
-                                            <input
-                                                type="number"
-                                                value={content.mileage_rate}
-                                                onChange={(e) => setContent({...content, mileage_rate: parseFloat(e.target.value)})}
-                                                style={inputStyle}
-                                                step="0.01"
-                                                min="0"
-                                            />
-                                        </Section>
-
-                                        <Section label="Percentage Charged (%)">
-                                            <input
-                                                type="number"
-                                                value={content.perc_charged}
-                                                onChange={(e) => setContent({...content, perc_charged: e.target.value})}
-                                                style={inputStyle}
-                                                min="0"
-                                                max="100"
-                                            />
-                                        </Section>
-
-                                        <Section label="Care Type">
-                                            <input
-                                                type="text"
-                                                value={content.care_type}
-                                                onChange={(e) => setContent({...content, care_type: e.target.value})}
-                                                style={inputStyle}
-                                            />
-                                        </Section>
+                                            <span style={{ fontWeight: 'bold' }}>Requires Initial Contact Date</span>
+                                        </label>
+                                        <small style={{ color: '#64748b', display: 'block', marginTop: '5px', marginLeft: '28px' }}>
+                                            When checked, the Initial Contact Date field becomes required in the agreement form (for GA/SC branches)
+                                        </small>
                                     </div>
 
-                                    <div style={{ marginTop: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <div className="form-group" style={{ marginBottom: '20px', background: '#f8fafc', padding: '15px', borderRadius: '8px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
                                             <input
                                                 type="checkbox"
-                                                checked={content.has_initial_contact}
-                                                onChange={(e) => setContent({...content, has_initial_contact: e.target.checked})}
+                                                name="requires_consumer_notice"
+                                                checked={content.requires_consumer_notice || false}
+                                                onChange={handleChange}
+                                                style={{ width: '18px', height: '18px' }}
                                             />
-                                            <span>Has Initial Contact Date (GA/SC branches)</span>
+                                            <span style={{ fontWeight: 'bold' }}>Requires Consumer Notice Page (Page 3.1)</span>
                                         </label>
+                                        <small style={{ color: '#64748b', display: 'block', marginTop: '5px', marginLeft: '28px' }}>
+                                            When checked, the Consumer Notice of Direct Care Worker Status page is added to the PDF (PA branches)
+                                        </small>
+                                    </div>
 
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={content.requires_consumer_notice}
-                                                onChange={(e) => setContent({...content, requires_consumer_notice: e.target.checked})}
-                                            />
-                                            <span>Requires Consumer Notice (PA branches)</span>
-                                        </label>
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label>Holiday Count</label>
+                                        <select
+                                            name="holiday_count"
+                                            value={content.holiday_count || 11}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        >
+                                            <option value="11">11 Holidays (Standard)</option>
+                                            <option value="12">12 Holidays (Includes Easter Sunday)</option>
+                                        </select>
+                                        <small style={{ color: '#64748b' }}>Affects the Federal Holidays section in the agreement</small>
+                                    </div>
+
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label>Special Instructions</label>
+                                        <textarea
+                                            name="special_instructions"
+                                            value={content.special_instructions || ''}
+                                            onChange={handleChange}
+                                            rows="2"
+                                            className="form-input"
+                                            placeholder="Any special instructions for this branch..."
+                                        />
+                                        <small style={{ color: '#64748b' }}>Internal notes only - not shown in agreements</small>
+                                    </div>
+
+                                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                                        <label>Default Care Type</label>
+                                        <input
+                                            type="text"
+                                            name="care_type"
+                                            value={content.care_type || 'Home Care'}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
                                     </div>
                                 </div>
                             )}
-                        </div>
 
-                        {/* Footer */}
+                            {/* Quick Tips Section */}
+                            <div style={{
+                                marginTop: '30px',
+                                padding: '15px',
+                                background: '#f1f5f9',
+                                borderRadius: '8px',
+                                border: '1px dashed #94a3b8'
+                            }}>
+                                <h5 style={{ margin: '0 0 10px 0', color: '#0f172a', fontSize: '14px' }}>
+                                    📝 Template Tips:
+                                </h5>
+                                <ul style={{ margin: 0, paddingLeft: '20px', color: '#334155', fontSize: '12px' }}>
+                                    <li>Fields marked with <span style={{ color: '#4facfe' }}>✨</span> will auto-populate new agreements</li>
+                                    <li>Save this template to set defaults for all future agreements using {branchName}</li>
+                                    <li>Users can still override these values when creating individual agreements</li>
+                                    <li>Settings tab controls validation rules and branch behavior</li>
+                                </ul>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                <div className="modal-footer" style={{ 
+                    padding: '20px', 
+                    borderTop: '1px solid #e2e8f0', 
+                    display: 'flex', 
+                    gap: '10px', 
+                    justifyContent: 'flex-end',
+                    background: '#f8fafc'
+                }}>
+                    {saveSuccess && (
                         <div style={{ 
-                            padding: '20px',
-                            borderTop: '1px solid #e2e8f0',
-                            display: 'flex',
-                            gap: '10px',
-                            justifyContent: 'flex-end'
+                            color: '#10b981', 
+                            fontSize: '14px', 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            marginRight: 'auto'
                         }}>
-                            <button onClick={onClose} className="cancel-btn">
-                                Cancel
-                            </button>
-                            <button 
-                                onClick={handleSave} 
-                                className="action-btn"
-                                disabled={saving}
-                            >
-                                {saving ? 'Saving...' : 'Save Content'}
-                            </button>
+                            ✓ Saved successfully!
                         </div>
-                    </>
-                )}
+                    )}
+                    <button className="cancel-btn" onClick={onClose}>Cancel</button>
+                    <button 
+                        className="action-btn" 
+                        onClick={handleSave} 
+                        disabled={saving}
+                        style={{
+                            background: saving ? '#94a3b8' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                            minWidth: '120px'
+                        }}
+                    >
+                        {saving ? 'Saving...' : '💾 Save Template'}
+                    </button>
+                </div>
             </div>
+            <style>{`
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };
 
-// Helper Components
 const TabButton = ({ active, onClick, children }) => (
     <button
         onClick={onClick}
         style={{
-            padding: '12px 20px',
+            padding: '10px 20px',
             background: active ? '#4facfe' : 'transparent',
             color: active ? 'white' : '#64748b',
             border: 'none',
-            borderBottom: active ? '2px solid #4facfe' : '2px solid transparent',
+            borderBottom: active ? '3px solid #2563eb' : 'none',
             cursor: 'pointer',
             fontWeight: active ? '600' : '400',
+            fontSize: '14px',
             transition: 'all 0.2s'
+        }}
+        onMouseOver={(e) => {
+            if (!active) {
+                e.target.style.background = '#f1f5f9';
+                e.target.style.color = '#0f172a';
+            }
+        }}
+        onMouseOut={(e) => {
+            if (!active) {
+                e.target.style.background = 'transparent';
+                e.target.style.color = '#64748b';
+            }
         }}
     >
         {children}
     </button>
 );
-
-const Section = ({ label, children }) => (
-    <div style={{ marginBottom: '20px' }}>
-        <label style={{ 
-            fontWeight: '600', 
-            display: 'block', 
-            marginBottom: '5px',
-            color: '#1e293b'
-        }}>
-            {label}
-        </label>
-        {children}
-    </div>
-);
-
-const inputStyle = {
-    width: '100%',
-    padding: '10px',
-    border: '2px solid #e2e8f0',
-    borderRadius: '6px',
-    fontSize: '14px'
-};
-
-const textareaStyle = {
-    ...inputStyle,
-    resize: 'vertical'
-};
-
-const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '20px'
-};
 
 export default BranchContentEditor;

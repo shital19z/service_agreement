@@ -71,33 +71,33 @@ def generate_page3(data):
     html = '<div>'
     
     html += '''
-    <p style="text-align: center; font-weight:700; font-size: 16pt; font-family: Calibri; font-style: normal; text-decoration: underline; margin:5px 0;"><b>Authorization for a Repeating Electronic Funds Transfer</b></p>
-    <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:2px 0;">(Save time and postage. Avoid interest charges, late payments, and termination notices)</p>
+    <p style="text-align: center; font-weight:700; font-size: 16pt; font-family: Calibri; font-style: normal; text-decoration: underline; margin:10px 0;"><b>Authorization for a Repeating Electronic Funds Transfer</b></p>
+    <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:4px 0 15px 0;">(Save time and postage. Avoid interest charges, late payments, and termination notices)</p>
     '''
     
     html += f'''
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:5px 0; line-height:1.3;">I, the undersigned, acknowledge that invoices prepared by Options for Senior America (Options) are due upon receipt, and therefore hereby authorize Options to withdraw any amounts owed by me on the same day as the invoice is prepared and emailed to me. This funds withdrawal is made by initiating an electronic funds transfer, as a debit through ACH (Automated Clearing House) from my account at the financial institution (hereinafter "Bank") indicated below. I also agree that, in the event the below mentioned care recipient passes away, I will not close this referenced bank account until I receive notification from Options that the final Options invoice is paid in full using the method of payment herein described. Furthermore, I authorize Bank to accept and to debit entries indicated by Options from my account.</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:15px 0 12px 0; line-height:1.5;">I, the undersigned, acknowledge that invoices prepared by Options for Senior America (Options) are due upon receipt, and therefore hereby authorize Options to withdraw any amounts owed by me on the same day as the invoice is prepared and emailed to me. This funds withdrawal is made by initiating an electronic funds transfer, as a debit through ACH (Automated Clearing House) from my account at the financial institution (hereinafter "Bank") indicated below. I also agree that, in the event the below mentioned care recipient passes away, I will not close this referenced bank account until I receive notification from Options that the final Options invoice is paid in full using the method of payment herein described. Furthermore, I authorize Bank to accept and to debit entries indicated by Options from my account.</p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0; line-height:1.3;">This authorization is to remain in full force and effect until Options and Bank have received written notice from me of its termination in such time and in such manner as to afford Options and Bank reasonable opportunity to act on it.</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:12px 0 20px 0; line-height:1.5;">This authorization is to remain in full force and effect until Options and Bank have received written notice from me of its termination in such time and in such manner as to afford Options and Bank reasonable opportunity to act on it.</p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:8px 0 3px 30px;">Care Recipient Name:&nbsp;&nbsp;<b>{care_name}</b></p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:20px 0 8px 30px;">Care Recipient Name:&nbsp;&nbsp;<b>{care_name}</b></p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Client Bank Account Signatory Name:&nbsp;&nbsp;<b>{clt_name}</b></p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:8px 0 8px 30px;">Client Bank Account Signatory Name:&nbsp;&nbsp;<b>{clt_name}</b></p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Client Signature:&nbsp;&nbsp;_______________________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:8px 0 8px 30px;">Client Signature:&nbsp;&nbsp;_______________________________________</p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 5px 30px;">Date:&nbsp;&nbsp;<b>{datetime.now().strftime("%m/%d/%Y")}</b></p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:8px 0 15px 30px;">Date:&nbsp;&nbsp;<b>{datetime.now().strftime("%m/%d/%Y")}</b></p>
     
-    <p style="font-weight:700; font-size: 12pt; font-family: Calibri; font-style: normal; margin:5px 0 5px 30px;">&nbsp;&nbsp;****************************************************************</p>
+    <p style="font-weight:700; font-size: 12pt; font-family: Calibri; font-style: normal; margin:15px 0 15px 30px;">&nbsp;&nbsp;****************************************************************</p>
     
-    <p style="font-weight:700; font-size: 12pt; font-family: Calibri; font-style: normal; margin:5px 0 3px 30px; text-decoration: underline;"><b>Account Information</b></p>
+    <p style="font-weight:700; font-size: 12pt; font-family: Calibri; font-style: normal; margin:15px 0 10px 30px; text-decoration: underline;"><b>Account Information</b></p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Bank Name, City, and State:&nbsp;&nbsp;_____________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:10px 0 10px 30px;">Bank Name, City, and State:&nbsp;&nbsp;_____________________________</p>
     
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">Routing Transit #:&nbsp;&nbsp;_________________________________</p>
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:10px 0 10px 30px;">Routing Transit #:&nbsp;&nbsp;_________________________________</p>
     
     <!-- Account Type with square boxes in front - Using the same style as OPTIONS logo -->
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:3px 0 3px 30px;">
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:10px 0 10px 30px;">
         <table style="margin:0; padding:0; border-collapse: collapse;">
             <tr>
                 <td style="font-weight:400; white-space: nowrap;">Account Type:&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -121,7 +121,7 @@ def generate_page3(data):
         </table>
     </p>
     
-    <div style="margin:10px 30px; text-align: center; font-weight:400; font-size: 10pt; padding:40px; border: 3px double #000;"><b>----------Please Attach a Voided Check Here----------</b></div>
+    <div style="margin:20px 30px; text-align: center; font-weight:400; font-size: 10pt; padding:60px; border: 3px double #000;"><b>----------Please Attach a Voided Check Here----------</b></div>
     '''
     
     html += '</div>'

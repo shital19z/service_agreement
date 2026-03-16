@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { endpoint } from '../resource/Constant';
 
-const BranchDropdown = ({ onBranchChange, selectedValue }) => {
-    const [branches, setBranches] = useState([]);
-    const [loading, setLoading] = useState(true);
+const BranchDropdown = ({ onBranchChange, selectedValue, branches: externalBranches, loading: externalLoading }) => {
+    const [internalBranches, setInternalBranches] = useState([]);
+    const [internalLoading, setInternalLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Use external branches if provided, otherwise fetch internally
+    const branches = externalBranches || internalBranches;
+    const loading = externalBranches ? (externalLoading || false) : internalLoading;
+
     useEffect(() => {
+        // Only fetch internally if no external branches are provided
+        if (externalBranches) return;
+
         const fetchBranches = async () => {
             try {
-                setLoading(true);
-                // Added a timestamp to the URL to prevent browser caching (the 24 vs 70 issue)
+                setInternalLoading(true);
                 const response = await fetch(`${endpoint}/branches?t=${new Date().getTime()}`);
                 
                 if (!response.ok) {
@@ -18,29 +24,26 @@ const BranchDropdown = ({ onBranchChange, selectedValue }) => {
                 }
                 
                 const data = await response.json();
-                console.log("Branches received by component:", data);
-                setBranches(data);
+                setInternalBranches(data);
             } catch (err) {
                 console.error("Error loading branches:", err);
                 setError(err.message);
             } finally {
-                setLoading(false);
+                setInternalLoading(false);
             }
         };
 
         fetchBranches();
-    }, []);
+    }, [externalBranches]);
 
     const handleSelect = (e) => {
         const selectedCode = e.target.value;
         const branchObj = branches.find(b => b.branch_code === selectedCode);
         
         if (branchObj) {
-            console.log("Selected branch object:", branchObj);
             onBranchChange({
                 branch_code: branchObj.branch_code,
                 branch_name: branchObj.branch_name,
-                // Match the backend key 'branch_state'
                 state_code: branchObj.branch_state
             });
         } else {

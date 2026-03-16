@@ -19,9 +19,9 @@ def json_to_pdf(data_dict):
     Generate multi-page PDF service agreement matching SA - DC.pdf format
     """
     
-    # Extract data
-    branch = data_dict.get('branch_code', '').lower()
-    care_state = data_dict.get('care_state', '').upper()
+    # Extract data - ✅ FIX: use (... or '') to handle None values safely
+    branch = (data_dict.get('branch_code') or '').lower()
+    care_state = (data_dict.get('care_state') or '').upper()
 
     def get_branch_specific_footer(branch_code : str) -> str:
         print('branch_code[:2] --->' , branch_code[:2])
@@ -44,7 +44,10 @@ def json_to_pdf(data_dict):
     
     # Page 3.1 is only for specific branches
     page3_1_html = ""
-    requires_consumer_notice = branch in ['nspahomecare', 'nspahomecare_staging', 'hbhomecare', 'hbhomecare_staging']
+    requires_consumer_notice = (
+    data_dict.get('requires_consumer_notice', False)
+    or branch in ['nspahomecare', 'nspahomecare_staging', 'hbhomecare', 'hbhomecare_staging']
+    )
     if requires_consumer_notice:
         page3_1_html = generate_page3_1(data_dict)
     
@@ -106,7 +109,7 @@ def json_to_pdf(data_dict):
                 <table width="100%">
                     <tr>
                         <td align="left">{get_branch_specific_footer(branch)}</td>
-                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 2)}</td>
                     </tr>
                 </table>
             </div>
@@ -120,7 +123,7 @@ def json_to_pdf(data_dict):
                 <table width="100%">
                     <tr>
                         <td align="left">{get_branch_specific_footer(branch)}</td>
-                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 3)}</td>
                     </tr>
                 </table>
             </div>
@@ -134,7 +137,7 @@ def json_to_pdf(data_dict):
                 <table width="100%">
                     <tr>
                         <td align="left">{get_branch_specific_footer(branch)}</td>
-                        <td align="right">{get_footer_tag(branch, care_state, 1)}</td>
+                        <td align="right">{get_footer_tag(branch, care_state, 4)}</td>
                     </tr>
                 </table>
             </div>
