@@ -21,7 +21,7 @@ def generate_page1(data):
    
     
     # Get branch for conditional logic
-    branch = data.get('branch_code', '').lower()
+    branch = (data.get('branch_code') or '').lower()
     
     # Get values
     clt_title = data.get('clt_title', '')
@@ -29,7 +29,7 @@ def generate_page1(data):
     clt_last = data.get('clt_last_name', '')
     clt_address = data.get('clt_address', '')
     clt_city = data.get('clt_city', '')
-    clt_state = data.get('clt_state', '')
+    clt_state = data.get('clt_state') or ''
     clt_zip = data.get('clt_zip', '')
     
     # Fix: Handle empty relationship properly
@@ -49,7 +49,7 @@ def generate_page1(data):
     care_last = data.get('care_last_name', '')
     care_address = data.get('care_recipient_address', '')
     care_city = data.get('care_city', '')
-    care_state = data.get('care_state', '')
+    care_state = data.get('care_state') or ''
     care_zip = data.get('care_zip', '')
     
     # Check if client and care recipient are the same person

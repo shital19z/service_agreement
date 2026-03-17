@@ -51,11 +51,10 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
                 },
                 body: JSON.stringify(content)
             });
-            
             if (response.ok) {
                 setSaveSuccess(true);
                 setTimeout(() => {
-                    alert('✅ Template saved successfully! This content will now auto-populate new agreements for this branch.');
+                    alert('✅ Template saved successfully!');
                     onSave();
                     onClose();
                 }, 500);
@@ -63,7 +62,6 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
                 alert('❌ Failed to save content');
             }
         } catch (error) {
-            console.error('Error saving content:', error);
             alert('❌ Error saving content');
         } finally {
             setSaving(false);
@@ -72,595 +70,288 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
 
     if (!isOpen) return null;
 
+    const Field = ({ label, name, rows, placeholder, hint }) => (
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600', marginBottom: '6px' }}>
+                <span style={{ color: '#4facfe', fontSize: '14px' }}>✨</span> {label}
+            </label>
+            {rows ? (
+                <textarea name={name} value={content[name] || ''} onChange={handleChange}
+                    rows={rows} className="form-input" placeholder={placeholder || ''} />
+            ) : (
+                <input type="text" name={name} value={content[name] || ''} onChange={handleChange}
+                    className="form-input" placeholder={placeholder || ''} />
+            )}
+            {hint && <small style={{ color: '#64748b', display: 'block', marginTop: '4px' }}>{hint}</small>}
+        </div>
+    );
+
+    const NumberField = ({ label, name, step, min, max, defaultVal, hint }) => (
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600', marginBottom: '6px' }}>
+                <span style={{ color: '#4facfe', fontSize: '14px' }}>✨</span> {label}
+            </label>
+            <input type="number" name={name} value={content[name] ?? defaultVal}
+                onChange={handleChange} step={step || '1'} min={min} max={max} className="form-input" />
+            {hint && <small style={{ color: '#64748b', display: 'block', marginTop: '4px' }}>{hint}</small>}
+        </div>
+    );
+
     return (
         <div className="modal-overlay">
             <div className="modal-content" style={{ maxWidth: '900px', width: '95%', maxHeight: '90vh' }}>
                 <div className="modal-header">
-                    <h3>
-                        <span style={{ marginRight: '8px' }}>📋</span>
-                        Edit Branch Template: {branchName}
-                    </h3>
+                    <h3>📋 Edit Branch Template: {branchName}</h3>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
-                {/* Info Banner */}
                 <div style={{
-                    background: 'linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%)',
+                    background: 'linear-gradient(135deg, #f0f9ff, #e6f7ff)',
                     borderLeft: '4px solid #4facfe',
-                    padding: '12px 20px',
-                    margin: '0 20px 10px 20px',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                    color: '#0369a1',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px'
+                    padding: '10px 20px', margin: '0 20px 10px',
+                    borderRadius: '8px', fontSize: '13px', color: '#0369a1'
                 }}>
-                    <span style={{ fontSize: '20px' }}>ℹ️</span>
-                    <span>
-                        <strong>Template Content:</strong> This content will auto-populate new agreements when this branch is selected. 
-                        Fields marked with <span style={{ color: '#4facfe', fontWeight: 'bold' }}>✨</span> directly affect agreement generation.
-                    </span>
+                    ℹ️ <strong>Template Content:</strong> Fields marked <span style={{ color: '#4facfe' }}>✨</span> are used in PDF generation for this branch.
                 </div>
 
                 <div className="modal-body" style={{ maxHeight: 'calc(90vh - 160px)', overflowY: 'auto', padding: '20px' }}>
                     {/* Tab Navigation */}
                     <div style={{ display: 'flex', borderBottom: '2px solid #e2e8f0', marginBottom: '20px', flexWrap: 'wrap' }}>
-                        <TabButton active={activeTab === 'page1'} onClick={() => setActiveTab('page1')}>
-                            Page 1 <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
-                        </TabButton>
-                        <TabButton active={activeTab === 'page1cont'} onClick={() => setActiveTab('page1cont')}>
-                            Page 1 Cont <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
-                        </TabButton>
-                        <TabButton active={activeTab === 'page2'} onClick={() => setActiveTab('page2')}>
-                            Page 2 <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
-                        </TabButton>
-                        <TabButton active={activeTab === 'page3'} onClick={() => setActiveTab('page3')}>
-                            Page 3 <span style={{ fontSize: '10px', marginLeft: '5px', color: '#4facfe' }}>✨</span>
-                        </TabButton>
-                        <TabButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>
-                            Settings
-                        </TabButton>
+                        {['page1','page1cont','page2','settings'].map(tab => (
+                            <TabButton key={tab} active={activeTab === tab} onClick={() => setActiveTab(tab)}>
+                                {{ page1: 'Page 1', page1cont: 'Page 1 Cont', page2: 'Page 2', settings: 'Settings' }[tab]}
+                                {tab !== 'settings' && <span style={{ fontSize: '10px', marginLeft: '4px', color: '#4facfe' }}>✨</span>}
+                            </TabButton>
+                        ))}
                     </div>
 
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: '40px' }}>
-                            <div style={{ 
-                                width: '40px', 
-                                height: '40px', 
-                                border: '3px solid #e2e8f0',
-                                borderTopColor: '#4facfe',
-                                borderRadius: '50%',
-                                animation: 'spin 1s linear infinite',
-                                margin: '0 auto 15px auto'
-                            }}></div>
-                            Loading template content...
-                        </div>
+                        <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Loading template...</div>
                     ) : (
                         <>
-                            {/* PAGE 1 TAB */}
+                            {/* ── PAGE 1 ── */}
                             {activeTab === 'page1' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
-                                        Page 1 - Main Agreement 
-                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
-                                            (These fields auto-fill in new agreements)
-                                        </span>
-                                    </h4>
-                                    
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Required Services Introduction
-                                        </label>
-                                        <textarea
-                                            name="required_services"
-                                            value={content.required_services || ''}
-                                            onChange={handleChange}
-                                            rows="4"
-                                            className="form-input"
-                                            placeholder="Enter the required services introduction text..."
-                                        />
-                                        <small style={{ color: '#64748b' }}>This text appears in the REQUIRED SERVICES section</small>
+                                    <SectionTitle>Page 1 — Main Agreement</SectionTitle>
+
+                                    <Field name="required_services" label="Required Services"
+                                        rows={4} placeholder="In addition to the general services..."
+                                        hint="Text for the REQUIRED SERVICES section" />
+
+                                    <Field name="freq_of_visit" label="Frequency of Visits"
+                                        placeholder="e.g. Daily, Weekly, Mon-Fri"
+                                        hint="Text for FREQUENCY DURATION OF VISITS" />
+
+                                    <Field name="hazards" label="Hazards"
+                                        placeholder="None Reported" />
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                                        <NumberField name="hourly_rate" label="Hourly Rate ($)" step="0.01" defaultVal={36.00} />
+                                        <NumberField name="mileage_rate" label="Mileage Rate ($/mile)" step="0.01" defaultVal={0.67} />
+                                        <NumberField name="perc_charged" label="% Charged" min={0} max={100} defaultVal={100} />
                                     </div>
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Frequency of Visits (placeholder)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="freq_of_visit"
-                                            value={content.freq_of_visit || ''}
-                                            onChange={handleChange}
-                                            className="form-input"
-                                            placeholder="e.g., Daily, Weekly, Mon-Fri"
-                                        />
-                                        <small style={{ color: '#64748b' }}>Default text for FREQUENCY DURATION OF VISITS</small>
-                                    </div>
+                                    <Divider label="CHARGES / BILLING INTRO" />
+                                    <Field name="charges_text" label="Charges Section Text" rows={3}
+                                        placeholder="We bill bi-weekly for services rendered..."
+                                        hint="Introductory text for the CHARGES section on Page 1" />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Hazards (placeholder)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="hazards"
-                                            value={content.hazards || ''}
-                                            onChange={handleChange}
-                                            className="form-input"
-                                            placeholder="None Reported"
-                                        />
-                                    </div>
+                                    <Divider label="PAYMENT OBLIGATIONS" />
+                                    <Field name="payment_obligations_text" label="Payment Obligations Text" rows={4}
+                                        placeholder="The parties responsible for payment include..." />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label>Care Type</label>
-                                        <input
-                                            type="text"
-                                            name="care_type"
-                                            value={content.care_type || 'Home Care'}
-                                            onChange={handleChange}
-                                            className="form-input"
-                                        />
-                                    </div>
+                                    <Divider label="FEDERAL HOLIDAYS" />
+                                    <Field name="federal_holidays_text" label="Federal Holidays Text" rows={3}
+                                        placeholder="When services are required on Federal holidays..." />
 
-                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
-                                        <div className="form-group">
-                                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                                <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                                Hourly Rate ($)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="hourly_rate"
-                                                value={content.hourly_rate || 36.00}
-                                                onChange={handleChange}
-                                                step="0.01"
-                                                className="form-input"
-                                            />
-                                        </div>
+                                    <Divider label="LIVE-IN SERVICES" />
+                                    <Field name="live_in_text" label="Live-In Services & Care Provider Schedule" rows={5}
+                                        placeholder="OPTIONS care providers who provide live-in services..." />
 
-                                        <div className="form-group">
-                                            <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                                <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                                Mileage Rate ($/mile)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="mileage_rate"
-                                                value={content.mileage_rate || 0.67}
-                                                onChange={handleChange}
-                                                step="0.01"
-                                                className="form-input"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Percentage Charged (%)
-                                        </label>
-                                        <input
-                                            type="number"
-                                            name="perc_charged"
-                                            value={content.perc_charged || '100'}
-                                            onChange={handleChange}
-                                            min="0"
-                                            max="100"
-                                            className="form-input"
-                                        />
-                                    </div>
+                                    <Field name="care_type" label="Care Type"
+                                        placeholder="Home Care" />
                                 </div>
                             )}
 
-                            {/* PAGE 1 CONT TAB */}
+                            {/* ── PAGE 1 CONT ── */}
                             {activeTab === 'page1cont' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
-                                        Page 1 Continuation - Additional Terms
-                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
-                                            (These fields auto-fill in new agreements)
-                                        </span>
-                                    </h4>
-                                    
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Notice Period Text
-                                        </label>
-                                        <textarea
-                                            name="notice_period_text"
-                                            value={content.notice_period_text || ''}
-                                            onChange={handleChange}
-                                            rows="4"
-                                            className="form-input"
-                                            placeholder="e.g. OPTIONS may end services by giving 3 calendar days notice in writing..."
-                                        />
-                                        <small style={{ color: '#64748b' }}>Leave blank to use the default for this branch type (3-day or 10-day)</small>
-                                    </div>
+                                    <SectionTitle>Page 1 Continuation — Additional Terms</SectionTitle>
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Needs Assessment & Plan of Care
-                                        </label>
-                                        <textarea
-                                            name="needs_assessment_text"
-                                            value={content.needs_assessment_text || ''}
-                                            onChange={handleChange}
-                                            rows="3"
-                                            className="form-input"
-                                            placeholder="Enter needs assessment text..."
-                                        />
-                                    </div>
+                                    <Divider label="NEEDS ASSESSMENT & PLAN OF CARE" />
+                                    <Field name="needs_assessment_text" label="Needs Assessment & Plan of Care" rows={3}
+                                        placeholder="When a Needs Assessment and a Plan of Care is conducted..."
+                                        hint="Leave blank to use branch default" />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Your Valuables
-                                        </label>
-                                        <textarea
-                                            name="valuables_text"
-                                            value={content.valuables_text || ''}
-                                            onChange={handleChange}
-                                            rows="3"
-                                            className="form-input"
-                                            placeholder="Enter valuables text..."
-                                        />
-                                    </div>
+                                    <Divider label="YOUR VALUABLES" />
+                                    <Field name="valuables_text" label="Your Valuables" rows={3}
+                                        placeholder="Our care providers are not authorized to accept payments..." />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Medication Administration
-                                        </label>
-                                        <textarea
-                                            name="medication_text"
-                                            value={content.medication_text || ''}
-                                            onChange={handleChange}
-                                            rows="3"
-                                            className="form-input"
-                                            placeholder="Enter medication text..."
-                                        />
-                                    </div>
+                                    <Divider label="NOTICE PERIOD" />
+                                    <Field name="notice_period_text" label="Notice Period" rows={3}
+                                        placeholder="OPTIONS may end services under this agreement by giving 3 calendar days notice..."
+                                        hint="Leave blank for branch default (3-day or 10-day)" />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Cannot Be Hired
-                                        </label>
-                                        <textarea
-                                            name="cannot_hire_text"
-                                            value={content.cannot_hire_text || ''}
-                                            onChange={handleChange}
-                                            rows="6"
-                                            className="form-input"
-                                            placeholder="Enter cannot be hired text..."
-                                        />
-                                    </div>
+                                    <Divider label="ADMINISTERING MEDICATION" />
+                                    <Field name="medication_text" label="Medication Administration" rows={3}
+                                        placeholder="For those care recipients who require administration of medication..." />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Record Keeping
-                                        </label>
-                                        <textarea
-                                            name="record_keeping_text"
-                                            value={content.record_keeping_text || ''}
-                                            onChange={handleChange}
-                                            rows="4"
-                                            className="form-input"
-                                            placeholder="Enter record keeping text..."
-                                        />
-                                    </div>
+                                    <Divider label="OUR CARE PROVIDERS CANNOT BE HIRED BY YOU" />
+                                    <Field name="cannot_hire_text" label="Cannot Be Hired" rows={6}
+                                        placeholder="You understand that OPTIONS is not a staffing agency..." />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Mileage Reimbursement
-                                        </label>
-                                        <textarea
-                                            name="mileage_reimbursement_text"
-                                            value={content.mileage_reimbursement_text || ''}
-                                            onChange={handleChange}
-                                            rows="3"
-                                            className="form-input"
-                                            placeholder="Enter mileage reimbursement text..."
-                                        />
-                                    </div>
+                                    <Divider label="RECORD KEEPING" />
+                                    <Field name="record_keeping_text" label="Record Keeping" rows={4}
+                                        placeholder="It is standard policy and practice at OPTIONS..." />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Use of Family Vehicle
-                                        </label>
-                                        <textarea
-                                            name="vehicle_use_text"
-                                            value={content.vehicle_use_text || ''}
-                                            onChange={handleChange}
-                                            rows="2"
-                                            className="form-input"
-                                            placeholder="Enter vehicle use text..."
-                                        />
-                                    </div>
+                                    <Divider label="MILEAGE REIMBURSEMENT" />
+                                    <Field name="mileage_reimbursement_text" label="Mileage Reimbursement" rows={3}
+                                        placeholder="Mileage will be charged at the rate of $0.67 per mile..." />
+
+                                    <Divider label="USE OF FAMILY VEHICLE" />
+                                    <Field name="vehicle_use_text" label="Use of Family Vehicle" rows={2}
+                                        placeholder='If you wish to authorize our care providers to drive...' />
+
+                                    <Divider label="GENERAL PROVISIONS" />
+                                    <Field name="general_provisions_text" label="General Provisions (governing state clause)" rows={2}
+                                        placeholder="This Agreement shall be governed by the laws of..."
+                                        hint="Leave blank to use the branch default governing state" />
                                 </div>
                             )}
 
-                            {/* PAGE 2 TAB */}
+                            {/* ── PAGE 2 ── */}
                             {activeTab === 'page2' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
-                                        Page 2 - Patient Rights & Billing
-                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
-                                            (These fields auto-fill in new agreements)
-                                        </span>
-                                    </h4>
-                                    
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Patients' Rights Text
-                                        </label>
-                                        <textarea
-                                            name="patients_rights_text"
-                                            value={content.patients_rights_text || ''}
-                                            onChange={handleChange}
-                                            rows="12"
-                                            className="form-input"
-                                            placeholder="Enter patients' rights text..."
-                                        />
-                                    </div>
+                                    <SectionTitle>Page 2 — Patient Rights & Billing</SectionTitle>
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Complaint Procedures Text
-                                        </label>
-                                        <textarea
-                                            name="complaint_procedures_text"
-                                            value={content.complaint_procedures_text || ''}
-                                            onChange={handleChange}
-                                            rows="10"
-                                            className="form-input"
-                                            placeholder="Enter complaint procedures text..."
-                                        />
-                                    </div>
+                                    <Divider label="NOTICE OF PATIENTS' RIGHTS AND RESPONSIBILITIES" />
+                                    <Field name="patients_rights_text" label="Patients' Rights Text" rows={12}
+                                        placeholder="Enter patients' rights text..."
+                                        hint="Leave blank to use the standard text for this branch's state" />
 
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Billing Procedures Text
-                                        </label>
-                                        <textarea
-                                            name="billing_procedures_text"
-                                            value={content.billing_procedures_text || ''}
-                                            onChange={handleChange}
-                                            rows="12"
-                                            className="form-input"
-                                            placeholder="Enter billing procedures text..."
-                                        />
-                                    </div>
+                                    <Divider label="NOTICE OF COMPLAINT PROCEDURES" />
+                                    <Field name="complaint_procedures_text" label="Complaint Procedures Text" rows={10}
+                                        placeholder="Enter complaint procedures text..."
+                                        hint="Leave blank to use the standard text for this branch" />
+
+                                    <Divider label="NOTICE OF BILLING PROCEDURES" />
+                                    <Field name="billing_procedures_text" label="Billing Procedures Text" rows={10}
+                                        placeholder="Enter billing procedures text..."
+                                        hint="Leave blank to use the standard 5-item billing list" />
+
+                                    <Divider label="EFT AUTHORIZATION (Page 3)" />
+                                    <Field name="eft_authorization_text" label="EFT Authorization Text" rows={8}
+                                        placeholder="Enter EFT authorization text..." />
+
+                                    <Divider label="CONSUMER NOTICE (Page 3.1 — PA branches)" />
+                                    <Field name="consumer_notice_text" label="Consumer Notice Text" rows={5}
+                                        placeholder="Enter consumer notice text..." />
                                 </div>
                             )}
 
-                            {/* PAGE 3 TAB */}
-                            {activeTab === 'page3' && (
-                                <div>
-                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
-                                        Page 3 - EFT Authorization
-                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
-                                            (These fields auto-fill in new agreements)
-                                        </span>
-                                    </h4>
-                                    
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            EFT Authorization Text
-                                        </label>
-                                        <textarea
-                                            name="eft_authorization_text"
-                                            value={content.eft_authorization_text || ''}
-                                            onChange={handleChange}
-                                            rows="15"
-                                            className="form-input"
-                                            placeholder="Enter EFT authorization text..."
-                                        />
-                                    </div>
-
-                                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <span style={{ color: '#4facfe', fontSize: '16px' }}>✨</span>
-                                            Consumer Notice Text (Page 3.1)
-                                        </label>
-                                        <textarea
-                                            name="consumer_notice_text"
-                                            value={content.consumer_notice_text || ''}
-                                            onChange={handleChange}
-                                            rows="8"
-                                            className="form-input"
-                                            placeholder="Enter consumer notice text..."
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* SETTINGS TAB */}
+                            {/* ── SETTINGS ── */}
                             {activeTab === 'settings' && (
                                 <div>
-                                    <h4 style={{ marginBottom: '15px', color: '#0f172a' }}>
-                                        Branch Settings
-                                        <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px', color: '#64748b' }}>
-                                            (These affect validation and behavior)
-                                        </span>
-                                    </h4>
-                                    
-                                    <div className="form-group" style={{ marginBottom: '20px', background: '#f8fafc', padding: '15px', borderRadius: '8px' }}>
+                                    <SectionTitle>Branch Settings</SectionTitle>
+
+                                    <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
                                         <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-                                            <input
-                                                type="checkbox"
-                                                name="has_initial_contact"
-                                                checked={content.has_initial_contact || false}
-                                                onChange={handleChange}
-                                                style={{ width: '18px', height: '18px' }}
-                                            />
+                                            <input type="checkbox" name="has_initial_contact"
+                                                checked={content.has_initial_contact || false} onChange={handleChange}
+                                                style={{ width: '18px', height: '18px' }} />
                                             <span style={{ fontWeight: 'bold' }}>Requires Initial Contact Date</span>
                                         </label>
-                                        <small style={{ color: '#64748b', display: 'block', marginTop: '5px', marginLeft: '28px' }}>
-                                            When checked, the Initial Contact Date field becomes required in the agreement form (for GA/SC branches)
+                                        <small style={{ color: '#64748b', marginLeft: '28px', display: 'block', marginTop: '4px' }}>
+                                            Makes Initial Contact Date required in the agreement form (GA/SC branches)
                                         </small>
                                     </div>
 
-                                    <div className="form-group" style={{ marginBottom: '20px', background: '#f8fafc', padding: '15px', borderRadius: '8px' }}>
+                                    <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
                                         <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-                                            <input
-                                                type="checkbox"
-                                                name="requires_consumer_notice"
-                                                checked={content.requires_consumer_notice || false}
-                                                onChange={handleChange}
-                                                style={{ width: '18px', height: '18px' }}
-                                            />
+                                            <input type="checkbox" name="requires_consumer_notice"
+                                                checked={content.requires_consumer_notice || false} onChange={handleChange}
+                                                style={{ width: '18px', height: '18px' }} />
                                             <span style={{ fontWeight: 'bold' }}>Requires Consumer Notice Page (Page 3.1)</span>
                                         </label>
-                                        <small style={{ color: '#64748b', display: 'block', marginTop: '5px', marginLeft: '28px' }}>
-                                            When checked, the Consumer Notice of Direct Care Worker Status page is added to the PDF (PA branches)
+                                        <small style={{ color: '#64748b', marginLeft: '28px', display: 'block', marginTop: '4px' }}>
+                                            Adds the Consumer Notice of Direct Care Worker Status page to the PDF (PA branches)
                                         </small>
                                     </div>
 
                                     <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label>Holiday Count</label>
-                                        <select
-                                            name="holiday_count"
-                                            value={content.holiday_count || 11}
-                                            onChange={handleChange}
-                                            className="form-input"
-                                        >
+                                        <label style={{ fontWeight: '600', marginBottom: '6px', display: 'block' }}>Holiday Count</label>
+                                        <select name="holiday_count" value={content.holiday_count || 11}
+                                            onChange={handleChange} className="form-input">
                                             <option value="11">11 Holidays (Standard)</option>
                                             <option value="12">12 Holidays (Includes Easter Sunday)</option>
                                         </select>
-                                        <small style={{ color: '#64748b' }}>Affects the Federal Holidays section in the agreement</small>
+                                        <small style={{ color: '#64748b' }}>Affects the Federal Holidays section</small>
                                     </div>
 
                                     <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label>Special Instructions</label>
-                                        <textarea
-                                            name="special_instructions"
-                                            value={content.special_instructions || ''}
-                                            onChange={handleChange}
-                                            rows="2"
-                                            className="form-input"
-                                            placeholder="Any special instructions for this branch..."
-                                        />
-                                        <small style={{ color: '#64748b' }}>Internal notes only - not shown in agreements</small>
+                                        <label style={{ fontWeight: '600', marginBottom: '6px', display: 'block' }}>Default Care Type</label>
+                                        <input type="text" name="care_type" value={content.care_type || 'Home Care'}
+                                            onChange={handleChange} className="form-input" />
                                     </div>
 
                                     <div className="form-group" style={{ marginBottom: '20px' }}>
-                                        <label>Default Care Type</label>
-                                        <input
-                                            type="text"
-                                            name="care_type"
-                                            value={content.care_type || 'Home Care'}
-                                            onChange={handleChange}
-                                            className="form-input"
-                                        />
+                                        <label style={{ fontWeight: '600', marginBottom: '6px', display: 'block' }}>Special Instructions (internal notes)</label>
+                                        <textarea name="special_instructions" value={content.special_instructions || ''}
+                                            onChange={handleChange} rows={2} className="form-input"
+                                            placeholder="Internal notes only — not shown in agreements" />
                                     </div>
                                 </div>
                             )}
-
-                            {/* Quick Tips Section */}
-                            <div style={{
-                                marginTop: '30px',
-                                padding: '15px',
-                                background: '#f1f5f9',
-                                borderRadius: '8px',
-                                border: '1px dashed #94a3b8'
-                            }}>
-                                <h5 style={{ margin: '0 0 10px 0', color: '#0f172a', fontSize: '14px' }}>
-                                    📝 Template Tips:
-                                </h5>
-                                <ul style={{ margin: 0, paddingLeft: '20px', color: '#334155', fontSize: '12px' }}>
-                                    <li>Fields marked with <span style={{ color: '#4facfe' }}>✨</span> will auto-populate new agreements</li>
-                                    <li>Save this template to set defaults for all future agreements using {branchName}</li>
-                                    <li>Users can still override these values when creating individual agreements</li>
-                                    <li>Settings tab controls validation rules and branch behavior</li>
-                                </ul>
-                            </div>
                         </>
                     )}
                 </div>
 
-                <div className="modal-footer" style={{ 
-                    padding: '20px', 
-                    borderTop: '1px solid #e2e8f0', 
-                    display: 'flex', 
-                    gap: '10px', 
-                    justifyContent: 'flex-end',
-                    background: '#f8fafc'
+                <div className="modal-footer" style={{
+                    padding: '20px', borderTop: '1px solid #e2e8f0',
+                    display: 'flex', gap: '10px', justifyContent: 'flex-end', background: '#f8fafc'
                 }}>
                     {saveSuccess && (
-                        <div style={{ 
-                            color: '#10b981', 
-                            fontSize: '14px', 
-                            display: 'flex', 
-                            alignItems: 'center',
-                            marginRight: 'auto'
-                        }}>
-                            ✓ Saved successfully!
-                        </div>
+                        <div style={{ color: '#10b981', fontSize: '14px', marginRight: 'auto' }}>✓ Saved successfully!</div>
                     )}
                     <button className="cancel-btn" onClick={onClose}>Cancel</button>
-                    <button 
-                        className="action-btn" 
-                        onClick={handleSave} 
-                        disabled={saving}
-                        style={{
-                            background: saving ? '#94a3b8' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                            minWidth: '120px'
-                        }}
-                    >
+                    <button className="action-btn" onClick={handleSave} disabled={saving}
+                        style={{ background: saving ? '#94a3b8' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', minWidth: '120px' }}>
                         {saving ? 'Saving...' : '💾 Save Template'}
                     </button>
                 </div>
             </div>
-            <style>{`
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
         </div>
     );
 };
 
+const SectionTitle = ({ children }) => (
+    <h4 style={{ marginBottom: '20px', color: '#0f172a', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>
+        {children}
+    </h4>
+);
+
+const Divider = ({ label }) => (
+    <div style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', letterSpacing: '0.08em',
+        textTransform: 'uppercase', marginBottom: '8px', marginTop: '4px',
+        borderLeft: '3px solid #4facfe', paddingLeft: '8px' }}>
+        {label}
+    </div>
+);
+
 const TabButton = ({ active, onClick, children }) => (
-    <button
-        onClick={onClick}
-        style={{
-            padding: '10px 20px',
-            background: active ? '#4facfe' : 'transparent',
-            color: active ? 'white' : '#64748b',
-            border: 'none',
-            borderBottom: active ? '3px solid #2563eb' : 'none',
-            cursor: 'pointer',
-            fontWeight: active ? '600' : '400',
-            fontSize: '14px',
-            transition: 'all 0.2s'
-        }}
-        onMouseOver={(e) => {
-            if (!active) {
-                e.target.style.background = '#f1f5f9';
-                e.target.style.color = '#0f172a';
-            }
-        }}
-        onMouseOut={(e) => {
-            if (!active) {
-                e.target.style.background = 'transparent';
-                e.target.style.color = '#64748b';
-            }
-        }}
-    >
+    <button onClick={onClick} style={{
+        padding: '10px 20px',
+        background: active ? '#4facfe' : 'transparent',
+        color: active ? 'white' : '#64748b',
+        border: 'none',
+        borderBottom: active ? '3px solid #2563eb' : 'none',
+        cursor: 'pointer',
+        fontWeight: active ? '600' : '400',
+        fontSize: '14px',
+        transition: 'all 0.2s'
+    }}
+    onMouseOver={(e) => { if (!active) { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; } }}
+    onMouseOut={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; } }}>
         {children}
     </button>
 );

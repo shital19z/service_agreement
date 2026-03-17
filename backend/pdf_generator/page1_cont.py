@@ -8,12 +8,7 @@ def generate_page1_cont(data):
     # Create a copy of data to avoid modifying the original
     clean_data = data.copy() if data else {}
     
-    # Filter out any "BA" from string values in the data
-    for key, value in clean_data.items():
-     if key == 'branch_code':  # Skip this one!
-        continue
-    if isinstance(value, str):
-        clean_data[key] = value.replace('BA', '').replace('ba', '')
+    # BA filter removed — not in original PHP
     # Get values directly from cleaned data
     branch = clean_data.get('branch_code', '').lower()
     branch_data = clean_data.get('branch_data', {})
@@ -54,7 +49,7 @@ def generate_page1_cont(data):
     # Test branch live-in services
     if branch in ['testhomecare', 'testhomecare_staging']:
         html += '''
-        <div style="font-size:12px;margin-top:8px;line-height:1.2;">
+        <div style="font-size:13px;margin-top:8px;line-height:14px;">
             <p style="margin:3px 0;"><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; OPTIONS care providers who provide live-in services have a standard work schedule of twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of sleep (five (5) of which must be uninterrupted), and four (4) hours for meals and breaks. During this twelve (12) hour period, the care provider is considered off-duty, and must be provided with adequate, private, and sanitary accommodations. In the event the care recipient requests our live-in care provider to provide services during an off-duty period, then you will be responsible for additional charges, beyond the daily live-in rate, at our standard hourly rate times the number of hours worked during the interruption period. If, as a result of such request, our care provider is unable to rest for an uninterrupted five (5) hours, then you will be billed at our standard hourly rate for the entire eight (8) hour sleep time period.</p>
         </div>
         '''
@@ -87,10 +82,10 @@ def generate_page1_cont(data):
             "you be careful with such valuables, and alert OPTIONS and the police should you notice a loss."
         )
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>NEEDS ASSESSMENT &amp; PLAN OF CARE:</u></b> &nbsp; {_needs_assessment_body}</p>
         </div>
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>YOUR VALUABLES:</u></b> &nbsp; {_valuables_body}</p>
         </div>
         '''
@@ -113,7 +108,7 @@ def generate_page1_cont(data):
             "OPTIONS may end services under this agreement by giving 3 calendar days notice in writing."
         )
     html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>NOTICE PERIOD:</u></b> &nbsp; {_notice_period_body}</p>
         </div>
         '''
@@ -140,7 +135,7 @@ def generate_page1_cont(data):
 
     if branch in med_branches:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; {_medication_body}</p>
         </div>
         '''
@@ -148,7 +143,7 @@ def generate_page1_cont(data):
     # DC branch special case
     if branch in ['dchomecare', 'dchomecare_staging'] and care_state == "DC":
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>ADMINISTERING MEDICATION:</u></b> &nbsp; {_medication_body}</p>
         </div>
         '''
@@ -181,15 +176,15 @@ def generate_page1_cont(data):
     )
 
     html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>OUR CARE PROVIDERS CANNOT BE HIRED BY YOU:</u></b> &nbsp; {_cannot_hire_body}</p>
         </div>
         
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>RECORD KEEPING:</u></b> &nbsp; {_record_keeping_body}</p>
         </div>
         
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>MILEAGE REIMBURSEMENT:</u></b> &nbsp; {_mileage_body}</p>
         </div>
     '''
@@ -198,19 +193,19 @@ def generate_page1_cont(data):
     _vehicle_custom = clean_data.get('vehicle_use_text', '').strip()
     if _vehicle_custom:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; {_vehicle_custom}</p>
         </div>
         '''
     elif branch in ['scgahomecare', 'scgahomecare_staging', 'athomecare', 'athomecare_staging']:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; If you wish to authorize our care providers to drive your/the care recipient’s vehicle and hold Options and its care providers harmless and release them from any associated liability, please check the “Yes” box and place your initials next to it, or otherwise check the “No” box and place your initials next to it.&nbsp;&nbsp;<input type="checkbox" style="width:12px;height:12px;"> Yes _______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" style="width:12px;height:12px;"> No _______</p>
         </div>
         '''
     else:
         html += f'''
-        <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+        <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
             <p style="margin:3px 0;"><b><u>USE OF FAMILY VEHICLE:</u></b> &nbsp; If you wish to authorize our care providers to drive your/the care recipient's vehicle and hold Options and its care providers harmless and release them from any associated liability, please write "Authorized" here and initial: _______________________</p>
         </div>
         '''
@@ -218,16 +213,16 @@ def generate_page1_cont(data):
     # General Provisions - Governing State
     gen_prov_state = get_governing_state(branch)
     html += f'''
-    <div style="font-size:12px;margin-top:{top_margin};line-height:1.2;">
+    <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
         <p style="margin:3px 0;"><b><u>GENERAL PROVISIONS:</u></b></p>
-        <table width="100%" cellpadding="0" cellspacing="0" style="margin:3px 0;">
-            <tr><td width="20px" valign="top" style="font-size:12px;">a.</td><td style="font-size:12px; padding-bottom:3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</td></tr>
-            <tr><td width="20px" valign="top" style="font-size:12px;">b.</td><td style="font-size:12px; padding-bottom:3px;">No change, modification, termination, or attempted waiver of any of the provisions of this Agreement shall be binding upon Options or the undersigned unless put in writing and signed by Options and the undersigned.</td></tr>
-            <tr><td width="20px" valign="top" style="font-size:12px;">c.</td><td style="font-size:12px; padding-bottom:3px;">This Agreement shall be governed by the laws of the state of {gen_prov_state}.</td></tr>
-            <tr><td width="20px" valign="top" style="font-size:12px;">d.</td><td style="font-size:12px; padding-bottom:3px;">This Agreement supersedes all prior agreements and understandings, oral or written, between Options and the undersigned with respect to the subject matter hereof.</td></tr>
-        </table>
+        <ol type="a" style="padding:0 16px;">
+            <li style="margin-bottom:3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</li>
+            <li style="margin-bottom:3px;">No change, modification, termination, or attempted waiver of any of the provisions of this Agreement shall be binding upon Options or the undersigned unless put in writing and signed by Options and the undersigned.</li>
+            <li style="margin-bottom:3px;">This Agreement shall be governed by the laws of the state of {gen_prov_state}.</li>
+            <li style="margin-bottom:3px;">This Agreement supersedes all prior agreements and understandings, oral or written, between Options and the undersigned with respect to the subject matter hereof.</li>
+        </ol>
     </div>
-    '''
+        '''
     
     # Signature section based on branch - with page break avoidance
     html += '<div style="page-break-inside: avoid; margin-top: 8px;">'
@@ -248,7 +243,7 @@ def get_top_margin_cont(branch):
         'amfvahomecare', 'amfvahomecare_staging', 'woflhomecare', 'woflhomecare_staging',
         'lzflhomecare', 'lzflhomecare_staging'
     ]
-    return "4px" if branch in margin_7px_branches else "6px"
+    return "7px" if branch in margin_7px_branches else "14px"
 
 def get_governing_state(branch):
     """Get governing state based on branch"""
@@ -280,7 +275,7 @@ def get_governing_state(branch):
 def get_signature_3col_cont(clt_first, clt_last, clt_relationship, handled_by, current_date):
     """3-column signature for GA/SC branches on continuation page"""
     return f'''
-    <p style="font-size:12px;margin:10px 0 5px;line-height:1.2;text-align:center;"><b><i>I have read and agree to the above listed terms, and understand that this agreement is a contract under seal.</i></b></p>
+    <p style="font-size:12px;margin:24px 0;line-height:16px;text-align:center;"><b><i>I have read and agree to the above listed terms, and understand that this agreement is a contract under seal.</i></b></p>
     <table width="100%" style="font-size:12px;margin-top:5px; border-collapse: collapse;">
         <tr>
            <td width="33%" align="center" style="padding:0 5px;">
@@ -327,7 +322,7 @@ def get_signature_3col_cont(clt_first, clt_last, clt_relationship, handled_by, c
 def get_signature_2col_cont(clt_first, clt_last, clt_relationship, current_date):
     """2-column signature for most branches on continuation page"""
     return f'''
-    <p style="font-size:12px;margin:10px 0 5px;line-height:1.2;text-align:center;"><b><i>I have read and agree to the above listed terms, and understand that this agreement is a contract under seal.</i></b></p>
+    <p style="font-size:12px;margin:24px 0;line-height:16px;text-align:center;"><b><i>I have read and agree to the above listed terms, and understand that this agreement is a contract under seal.</i></b></p>
     <table width="100%" style="font-size:12px;margin-top:5px; border-collapse: collapse;">
         <tr>
             <td align="center" width="50%" style="padding-right:5px;">

@@ -88,7 +88,7 @@ def generate_page2(data):
     Generate Page 2 HTML - matches dynamic_sa_page2.php logic
     """
     # Get values directly from data
-    branch = data.get('branch_code', '').lower()
+    branch = (data.get('branch_code') or '').lower()
     care_state = data.get('care_state')
     if care_state is None:
       care_state = ''
@@ -526,7 +526,7 @@ def generate_page2(data):
             <li style="margin-bottom:{list_margin};">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Manager.</li>
             <li style="margin-bottom:{list_margin};">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient’s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>
             <li style="margin-bottom:{list_margin};">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>
-            <li style="margin-bottom:{list_margin};">If you are not satisfied with the proposed resolution, you may appeal to Options Corporate office at 1-800-2-OPTIONS, or in writing to OPTIONS, {address}, in which case your complaint would be reviewed and Options will get back to you in writing within 21 days of receipt of the appeal. You may also contact the Pennsylvania Department of Health\'s complaint hotline at 1-800-254-5164 and/or the Ombudsman Program at 717-780-6130 which is located at the Dauphin County Area Agency on Aging (AAA) office.</li>
+            <li style="margin-bottom:{list_margin};">If you are not satisfied with the proposed resolution, you may appeal to Options Corporate office at 1-800-2-OPTIONS, or in writing to OPTIONS, {address}, in which case your complaint would be reviewed and Options will get back to you in writing within 21 days of receipt of the appeal. You may also contact the Pennsylvania Department of Health complaint hotline at 1.800.254.5164 and/or the Ombudsman Program located with the local Area Agency on Aging (AAA) of each of the three counties we service: Chester - 610.344.6350, Delaware - 610.490.1300, and Montgomery - 215.784.5413. For licensing questions, you may contact 717.783.1379. You may also contact the Office of the State Long-Term Care Ombudsman, Pennsylvania Department of Aging, 555 Walnut Street, Harrisburg, PA 17101 Tel: 717.783.8975.</li>
         </ol>
         '''
     
