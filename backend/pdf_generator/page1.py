@@ -21,7 +21,7 @@ def generate_page1(data):
    
     
     # Get branch for conditional logic
-    branch = (data.get('branch_code') or '').lower()
+    branch = data.get('branch_code', '').lower()
     
     # Get values
     clt_title = data.get('clt_title', '')
@@ -29,7 +29,7 @@ def generate_page1(data):
     clt_last = data.get('clt_last_name', '')
     clt_address = data.get('clt_address', '')
     clt_city = data.get('clt_city', '')
-    clt_state = data.get('clt_state') or ''
+    clt_state = data.get('clt_state', '')
     clt_zip = data.get('clt_zip', '')
     
     # Fix: Handle empty relationship properly
@@ -39,7 +39,7 @@ def generate_page1(data):
         print(f"DEBUG - Setting default relationship to: '{clt_relationship}'")
     
     handled_by = data.get('handled_by', '')
-    perc_charged = data.get('perc_charged', data.get('PercCharged', '100'))
+    perc_charged = data.get('PercCharged', '100')
     
     # DEBUG: Print relationship value
     print(f"DEBUG - Page 1 - Relationship value after fix: '{clt_relationship}'")
@@ -49,7 +49,7 @@ def generate_page1(data):
     care_last = data.get('care_last_name', '')
     care_address = data.get('care_recipient_address', '')
     care_city = data.get('care_city', '')
-    care_state = data.get('care_state') or ''
+    care_state = data.get('care_state', '')
     care_zip = data.get('care_zip', '')
     
     # Check if client and care recipient are the same person
@@ -220,19 +220,14 @@ def generate_page1(data):
         </table>
         '''
     
-    # Required Services - FULLY DYNAMIC from branch template
-    # required_services from Edit Content replaces the entire intro paragraph.
-    # If empty, falls back to the original default text.
-    _default_req_services = (
-        "In addition to the general services that our caregivers provide such as assistance with activities of "
-        "daily living, meal preparation, light housekeeping, and laundry, the required services as stated by "
-        "the responsible party/client are:"
-    )
-    req_intro = required_services if required_services and required_services.strip() else _default_req_services
-
+    # Required Services - UPDATED to use required_services field
+    blank_div = '<div style="height:2px"> &nbsp; </div>'
+    req_services = required_services or care_type or blank_div  # UPDATED
+    
     html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; {req_intro}</p>
+            <p style="margin:1px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:</p>
+            <p style="margin:1px 0;">{req_services}</p>
         </div>
         
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
