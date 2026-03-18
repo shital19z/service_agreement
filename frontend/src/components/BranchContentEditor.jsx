@@ -134,9 +134,13 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
                                 <div>
                                     <SectionTitle>Page 1 — Main Agreement</SectionTitle>
 
-                                    <Field name="required_services" label="Required Services"
-                                        rows={4} placeholder="In addition to the general services..."
-                                        hint="Text for the REQUIRED SERVICES section" />
+                                    <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: '6px', padding: '8px 12px', marginBottom: '16px', fontSize: '12px', color: '#856404' }}>
+                                        📄 <strong>These fields control PDF Page 1.</strong> Leave any field blank to use the default text.
+                                    </div>
+
+                                    <Field name="required_services" label="Required Services (specific detail)"
+                                        rows={4} placeholder="e.g. Personal care, medication reminders, companionship"
+                                        hint="Shown AFTER the fixed intro sentence. Leave blank to show just the intro." />
 
                                     <Field name="freq_of_visit" label="Frequency of Visits"
                                         placeholder="e.g. Daily, Weekly, Mon-Fri"
@@ -177,6 +181,10 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
                             {activeTab === 'page1cont' && (
                                 <div>
                                     <SectionTitle>Page 1 Continuation — Additional Terms</SectionTitle>
+
+                                    <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: '6px', padding: '8px 12px', marginBottom: '16px', fontSize: '12px', color: '#856404' }}>
+                                        📄 <strong>These fields control PDF Page 1 Continuation (Page 2 of the PDF).</strong> Leave any field blank to use the default text.
+                                    </div>
 
                                     <Divider label="NEEDS ASSESSMENT & PLAN OF CARE" />
                                     <Field name="needs_assessment_text" label="Needs Assessment & Plan of Care" rows={3}
@@ -223,6 +231,10 @@ const BranchContentEditor = ({ isOpen, onClose, onSave, token, branchCode, branc
                             {activeTab === 'page2' && (
                                 <div>
                                     <SectionTitle>Page 2 — Patient Rights & Billing</SectionTitle>
+
+                                    <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: '6px', padding: '8px 12px', marginBottom: '16px', fontSize: '12px', color: '#856404' }}>
+                                        📄 <strong>These fields control PDF Pages 3, 4 (Patient Rights, EFT, Consumer Notice).</strong> Leave any field blank to use the default text.
+                                    </div>
 
                                     <Divider label="NOTICE OF PATIENTS' RIGHTS AND RESPONSIBILITIES" />
                                     <Field name="patients_rights_text" label="Patients' Rights Text" rows={12}

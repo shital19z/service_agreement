@@ -1,3 +1,4 @@
+
 """
 Main PDF Generator - Orchestrates all pages
 Produces PDF matching SA - DC.pdf format

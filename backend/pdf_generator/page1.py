@@ -220,14 +220,18 @@ def generate_page1(data):
         </table>
         '''
     
-    # Required Services - UPDATED to use required_services field
+    # Required Services
+    # Strip the old seeded intro sentence if it was stored — we only want the detail text
+    _req_detail = required_services or ''
+    if _req_detail.strip().startswith('In addition to the general services'):
+        _req_detail = ''
     blank_div = '<div style="height:2px"> &nbsp; </div>'
-    req_services = required_services or care_type or blank_div  # UPDATED
+    req_services_detail = _req_detail.strip() or blank_div
     
     html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
             <p style="margin:1px 0;"><b><u>REQUIRED SERVICES:</u></b> &nbsp; In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:</p>
-            <p style="margin:1px 0;">{req_services}</p>
+            <p style="margin:1px 0;">{req_services_detail}</p>
         </div>
         
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
@@ -274,39 +278,56 @@ def generate_page1(data):
     if branch in perc_branches:
         html += f'{perc_charged}% of the fees will be charged to {clt_first} {clt_last}<br>'
     
-    if branch in ['test2homecare', 'test2homecare_staging']:
+    _charges_custom = data.get('charges_text', '').strip()
+    if _charges_custom:
+        html += f'{_charges_custom}</p></div>'
+    elif branch in ['test2homecare', 'test2homecare_staging']:
         html += 'OPTIONS will invoice in advance; monthly or bi-monthly. Any prepaid amount at the end of our services will be FULLY REFUNDABLE. RN assessment fee is charged at $100.00 per quarter.</p></div>'
     else:
         html += 'We bill bi-weekly for services rendered during the prior two weeks. If service hours are 80 hours or more per week, and for all 7-day live-in cases, billing will be done weekly. Payments are due upon receipt of OPTIONS invoices.</p></div>'
     
     # Payment obligations
+    _payment_obligations_body = data.get('payment_obligations_text', '').strip() or (
+        "The parties responsible for payment include the person who initiates arrangements for our services, "
+        "as well as the care recipient and the care recipient's power of attorney or guardian. The responsibility "
+        "for payment cannot be shifted simply by asking us to bill an insurance company or a third party. Your "
+        "responsibility extends to making timely and prompt payments at all times. In the event the client or "
+        "care recipient cancels a shift with less than 24-hour notice, then a charge for our minimum 2-hour visit "
+        "will apply."
+    )
     html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>PAYMENT OBLIGATIONS:</u></b> &nbsp; The parties responsible for payment include the person who initiates arrangements for our services, as well as the care recipient and the care recipient's power of attorney or guardian. The responsibility for payment cannot be shifted simply by asking us to bill an insurance company or a third party. Your responsibility extends to making timely and prompt payments at all times. In the event the client or care recipient cancels a shift with less than 24-hour notice, then a charge for our minimum 2-hour visit will apply.</p>
+            <p style="margin:1px 0;"><b><u>PAYMENT OBLIGATIONS:</u></b> &nbsp; {_payment_obligations_body}</p>
         </div>
     '''
     
-    # Federal holidays - read holiday_count from DB (branch_content), fall back to branch check
-    # holiday_count is saved via Edit Content and passed in data by main.py
-    holiday_count = int(data.get('holiday_count', 0))
-    if holiday_count == 0:
-        # Fallback: mnhomecare has always used 12 holidays
-        holiday_count = 12 if branch in ['mnhomecare', 'mnhomecare_staging'] else 11
-
-    if holiday_count >= 12:
+    # Federal holidays - use custom text if provided, otherwise use holiday_count logic
+    _federal_holidays_custom = data.get('federal_holidays_text', '').strip()
+    if _federal_holidays_custom:
         html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 12 holidays as follows: New Year\'s Day, Martin Luther King Day, Presidents\' Day, Easter Sunday, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans\' Day, Thanksgiving Day, and Christmas Day.</p>
+            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; {_federal_holidays_custom}</p>
         </div>
         '''
     else:
-        html += f'''
-        <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 11 holidays as follows: New Year\'s Day, Martin Luther King Day, Presidents\' Day, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans\' Day, Thanksgiving Day, and Christmas Day.</p>
-        </div>
-        '''
+        holiday_count = int(data.get('holiday_count', 0))
+        if holiday_count == 0:
+            holiday_count = 12 if branch in ['mnhomecare', 'mnhomecare_staging'] else 11
+        if holiday_count >= 12:
+            html += f'''
+            <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+                <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 12 holidays as follows: New Year\'s Day, Martin Luther King Day, Presidents\' Day, Easter Sunday, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans\' Day, Thanksgiving Day, and Christmas Day.</p>
+            </div>
+            '''
+        else:
+            html += f'''
+            <div style="font-size:12px;margin-top:2px;line-height:1.2;">
+                <p style="margin:1px 0;"><b><u>FEDERAL HOLIDAYS:</u></b> &nbsp; When services are required on Federal holidays, you will be charged "time and a half" for those days (50% more than your usual daily charge). We apply those surcharges on the 11 holidays as follows: New Year\'s Day, Martin Luther King Day, Presidents\' Day, Memorial Day, Juneteenth Day, Independence Day, Labor Day, Columbus Day, Veterans\' Day, Thanksgiving Day, and Christmas Day.</p>
+            </div>
+            '''
     
-    # Live-in services (from PHP) - with condensed text
+    # Live-in services - use live_in_text override if provided, else branch-list + default
+    _live_in_custom = data.get('live_in_text', '').strip()
     live_in_branches = [
         'anhomecare', 'anhomecare_staging', 'athomecare', 'athomecare_staging', 'bahomecare', 'bahomecare_staging',
         'blhomecare', 'blhomecare_staging', 'dchomecare', 'dchomecare_staging', 'fkhomecare', 'fkhomecare_staging',
@@ -320,10 +341,21 @@ def generate_page1(data):
         'nspahomecare', 'nspahomecare_staging', 'tomdhomecare', 'tomdhomecare_staging', 'lzflhomecare', 'lzflhomecare_staging',
         'wpbflhomecare', 'wpbflhomecare_staging'
     ]
-    if branch in live_in_branches:
+    _live_in_default = (
+        "OPTIONS care providers who provide live-in services have a standard work schedule of twelve (12) hours per each "
+        "twenty-four hour day. This accounts for eight (8) hours of sleep (five (5) of which must be uninterrupted), and "
+        "four (4) hours for meals and breaks. During this twelve (12) hour period, the care provider is considered "
+        "off-duty, and must be provided with adequate, private, and sanitary accommodations. In the event the care "
+        "recipient requests our live-in care provider to provide services during an off-duty period, then you will be "
+        "responsible for additional charges, beyond the daily live-in rate, at our standard hourly rate times the number "
+        "of hours worked during the interruption period. If, as a result of such request, our care provider is unable to "
+        "rest for an uninterrupted five (5) hours, then you will be billed at our standard hourly rate for the entire "
+        "eight (8) hour sleep time period."
+    )
+    if _live_in_custom or branch in live_in_branches:
         html += f'''
         <div style="font-size:12px;margin-top:2px;line-height:1.2;">
-            <p style="margin:1px 0;"><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; OPTIONS care providers who provide live-in services have a standard work schedule of twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of sleep (five (5) of which must be uninterrupted), and four (4) hours for meals and breaks. During this twelve (12) hour period, the care provider is considered off-duty, and must be provided with adequate, private, and sanitary accommodations. In the event the care recipient requests our live-in care provider to provide services during an off-duty period, then you will be responsible for additional charges, beyond the daily live-in rate, at our standard hourly rate times the number of hours worked during the interruption period. If, as a result of such request, our care provider is unable to rest for an uninterrupted five (5) hours, then you will be billed at our standard hourly rate for the entire eight (8) hour sleep time period.</p>
+            <p style="margin:1px 0;"><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; {_live_in_custom or _live_in_default}</p>
         </div>
         '''
     
@@ -345,7 +377,7 @@ def generate_page1(data):
     word_count = len(html.split())
     
     # Get required services length
-    req_services_len = len(required_services or '')
+    req_services_len = len(_req_detail or '')
     hazards_len = len(hazards or '')
     
     # Standard page size information
@@ -492,7 +524,8 @@ def get_office_address(branch, data):
         'clhomecare', 'clhomecare_staging',
         'nvahomecare', 'nvahomecarearchive', 'nvahomecare_staging', 'rihomecare', 'rihomecare_staging',
         'hbhomecare', 'hbhomecare_staging',
-        'lzflhomecare', 'lzflhomecare_staging'
+        'lzflhomecare', 'lzflhomecare_staging',
+        'dchomecare', 'dchomecare_staging'
     ]
     
     if branch_lower in corporate_branches:

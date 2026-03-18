@@ -96,6 +96,8 @@ def generate_page3(data):
     
     <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:10px 0 10px 30px;">Routing Transit #:&nbsp;&nbsp;_________________________________</p>
     
+    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:10px 0 10px 30px;">Account Number:&nbsp;&nbsp;_______________________________________________</p>
+    
     <!-- Account Type with square boxes in front - Using the same style as OPTIONS logo -->
     <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:10px 0 10px 30px;">
         <table style="margin:0; padding:0; border-collapse: collapse;">

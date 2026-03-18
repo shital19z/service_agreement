@@ -132,7 +132,7 @@ def ensure_branch_content_exists():
         
         # Default content template
         default_content = {
-            "required_services": "In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:",
+            "required_services": "",
             "freq_of_visit": "",
             "hourly_rate": 36.00,
             "perc_charged": "100",
@@ -699,7 +699,13 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
             "PercCharged": str(getattr(agreement, 'perc_charged', '100')),
             "perc_charged": str(getattr(agreement, 'perc_charged', '100')),
             "hazards":           getattr(agreement, 'hazards', None) or branch_content.get('hazards', 'None Reported'),
-            "required_services": getattr(agreement, 'required_services', None) or branch_content.get('required_services', ''),
+            "required_services": (
+                None
+                if not agreement.required_services
+                or not agreement.required_services.strip()
+                or agreement.required_services.strip().startswith("In addition to the general services")
+                else agreement.required_services
+            ) or branch_content.get('required_services', ''),
             "freq_of_visit":     getattr(agreement, 'freq_of_visit', None) or branch_content.get('freq_of_visit', ''),
             "inicontactdate": agreement.inicontactdate.strftime("%m/%d/%Y") if hasattr(agreement, 'inicontactdate') and agreement.inicontactdate else "",
             "date_of_order": agreement.date_of_order.strftime("%m/%d/%Y") if hasattr(agreement, 'date_of_order') and agreement.date_of_order else "",
@@ -724,6 +730,9 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
             "mileage_reimbursement_text":   branch_content.get('mileage_reimbursement_text', ''),
             "vehicle_use_text":             branch_content.get('vehicle_use_text', ''),
             "payment_obligations_text":     branch_content.get('payment_obligations_text', ''),
+            "charges_text":                 branch_content.get('charges_text', ''),
+            "federal_holidays_text":        branch_content.get('federal_holidays_text', ''),
+            "live_in_text":                 branch_content.get('live_in_text', ''),
             "patients_rights_text":         branch_content.get('patients_rights_text', ''),
             "complaint_procedures_text":    branch_content.get('complaint_procedures_text', ''),
             "billing_procedures_text":      branch_content.get('billing_procedures_text', ''),
@@ -791,7 +800,7 @@ def create_branch(branch: BranchCreate, current_user: models.User = Depends(get_
         db.add(new_branch)
         db.commit()
         db.refresh(new_branch)
-        default_content = {"required_services": "In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:", "freq_of_visit": "", "hourly_rate": 36.00, "perc_charged": "100", "hazards": "None Reported", "mileage_rate": branch.mileage or 0.67, "care_type": "Home Care", "has_initial_contact": False, "notice_period": "3 calendar days", "holiday_count": 11, "requires_consumer_notice": False, "special_instructions": ""}
+        default_content = {"required_services": "", "freq_of_visit": "", "hourly_rate": 36.00, "perc_charged": "100", "hazards": "None Reported", "mileage_rate": branch.mileage or 0.67, "care_type": "Home Care", "has_initial_contact": False, "notice_period": "3 calendar days", "holiday_count": 11, "requires_consumer_notice": False, "special_instructions": ""}
         db.execute(text("INSERT INTO branch_content (branch_code, content_type, content_data, created_at, updated_at) VALUES (:code, 'agreement', :data, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"), {"code": branch.branch_code, "data": json.dumps(default_content)})
         db.commit()
         return JSONResponse(content={"message": "Branch created successfully", "branch": {"branch_code": new_branch.branch_code, "branch_name": new_branch.branch_name}}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
@@ -844,7 +853,7 @@ def get_branch_content(branch_code: str, db: Session = Depends(get_db)):
         if result:
             return JSONResponse(content=result[0], headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
         else:
-            default_content = {"required_services": "In addition to the general services that our caregivers provide such as assistance with activities of daily living, meal preparation, light housekeeping, and laundry, the required services as stated by the responsible party/client are:", "freq_of_visit": "", "hourly_rate": 36.00, "perc_charged": "100", "hazards": "None Reported", "mileage_rate": 0.67, "care_type": "Home Care", "has_initial_contact": False, "notice_period": "3 calendar days", "holiday_count": 11, "requires_consumer_notice": False, "special_instructions": ""}
+            default_content = {"required_services": "", "freq_of_visit": "", "hourly_rate": 36.00, "perc_charged": "100", "hazards": "None Reported", "mileage_rate": 0.67, "care_type": "Home Care", "has_initial_contact": False, "notice_period": "3 calendar days", "holiday_count": 11, "requires_consumer_notice": False, "special_instructions": ""}
             return JSONResponse(content=default_content, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
     except Exception as e:
         print(f"Error getting branch content: {e}")
@@ -1060,7 +1069,13 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
             "perc_charged": str(getattr(agreement, 'perc_charged', '100')),
             # Agreement-level fields, fall back to branch template
             "hazards":           getattr(agreement, 'hazards', None) or branch_content.get('hazards', 'None Reported'),
-            "required_services": getattr(agreement, 'required_services', None) or branch_content.get('required_services', ''),
+            "required_services": (
+                None
+                if not agreement.required_services
+                or not agreement.required_services.strip()
+                or agreement.required_services.strip().startswith("In addition to the general services")
+                else agreement.required_services
+            ) or branch_content.get('required_services', ''),
             "freq_of_visit":     getattr(agreement, 'freq_of_visit', None) or branch_content.get('freq_of_visit', ''),
             "inicontactdate": agreement.inicontactdate.strftime("%m/%d/%Y") if hasattr(agreement, 'inicontactdate') and agreement.inicontactdate else "",
             "date_of_order": agreement.date_of_order.strftime("%m/%d/%Y") if hasattr(agreement, 'date_of_order') and agreement.date_of_order else "",
@@ -1084,6 +1099,9 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
             "mileage_reimbursement_text":   branch_content.get('mileage_reimbursement_text', ''),
             "vehicle_use_text":             branch_content.get('vehicle_use_text', ''),
             "payment_obligations_text":     branch_content.get('payment_obligations_text', ''),
+            "charges_text":                 branch_content.get('charges_text', ''),
+            "federal_holidays_text":        branch_content.get('federal_holidays_text', ''),
+            "live_in_text":                 branch_content.get('live_in_text', ''),
             "patients_rights_text":         branch_content.get('patients_rights_text', ''),
             "complaint_procedures_text":    branch_content.get('complaint_procedures_text', ''),
             "billing_procedures_text":      branch_content.get('billing_procedures_text', ''),

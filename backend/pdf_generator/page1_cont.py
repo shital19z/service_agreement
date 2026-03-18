@@ -8,9 +8,14 @@ def generate_page1_cont(data):
     # Create a copy of data to avoid modifying the original
     clean_data = data.copy() if data else {}
     
-    # BA filter removed — not in original PHP
+    # Filter out any "BA" from string values in the data
+    for key, value in clean_data.items():
+     if key == 'branch_code':  # Skip this one!
+        continue
+    if isinstance(value, str):
+        clean_data[key] = value.replace('BA', '').replace('ba', '')
     # Get values directly from cleaned data
-    branch = clean_data.get('branch_code', '').lower()
+    branch = (clean_data.get('branch_code') or '').lower()
     branch_data = clean_data.get('branch_data', {})
     care_state = (clean_data.get('care_state') or '').upper()
     
@@ -49,7 +54,7 @@ def generate_page1_cont(data):
     # Test branch live-in services
     if branch in ['testhomecare', 'testhomecare_staging']:
         html += '''
-        <div style="font-size:13px;margin-top:8px;line-height:14px;">
+        <div style="font-size:13px;margin-top:6px;line-height:14px;">
             <p style="margin:3px 0;"><b><u>LIVE-IN SERVICES AND CARE PROVIDER SCHEDULE:</u></b> &nbsp; OPTIONS care providers who provide live-in services have a standard work schedule of twelve (12) hours per each twenty-four hour day. This accounts for eight (8) hours of sleep (five (5) of which must be uninterrupted), and four (4) hours for meals and breaks. During this twelve (12) hour period, the care provider is considered off-duty, and must be provided with adequate, private, and sanitary accommodations. In the event the care recipient requests our live-in care provider to provide services during an off-duty period, then you will be responsible for additional charges, beyond the daily live-in rate, at our standard hourly rate times the number of hours worked during the interruption period. If, as a result of such request, our care provider is unable to rest for an uninterrupted five (5) hours, then you will be billed at our standard hourly rate for the entire eight (8) hour sleep time period.</p>
         </div>
         '''
@@ -215,14 +220,14 @@ def generate_page1_cont(data):
     html += f'''
     <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
         <p style="margin:3px 0;"><b><u>GENERAL PROVISIONS:</u></b></p>
-        <ol type="a" style="padding:0 16px;">
-            <li style="margin-bottom:3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</li>
-            <li style="margin-bottom:3px;">No change, modification, termination, or attempted waiver of any of the provisions of this Agreement shall be binding upon Options or the undersigned unless put in writing and signed by Options and the undersigned.</li>
-            <li style="margin-bottom:3px;">This Agreement shall be governed by the laws of the state of {gen_prov_state}.</li>
-            <li style="margin-bottom:3px;">This Agreement supersedes all prior agreements and understandings, oral or written, between Options and the undersigned with respect to the subject matter hereof.</li>
-        </ol>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:3px 0;">
+            <tr><td width="20px" valign="top" style="font-size:13px;line-height:14px;padding-bottom:3px;">a.</td><td style="font-size:13px;line-height:14px;padding-bottom:3px;">The waiver by Options of a breach of any provision of this Agreement shall not be construed as a waiver of any other provision of this Agreement or of any future breach of the provision so waived.</td></tr>
+            <tr><td width="20px" valign="top" style="font-size:13px;line-height:14px;padding-bottom:3px;">b.</td><td style="font-size:13px;line-height:14px;padding-bottom:3px;">No change, modification, termination, or attempted waiver of any of the provisions of this Agreement shall be binding upon Options or the undersigned unless put in writing and signed by Options and the undersigned.</td></tr>
+            <tr><td width="20px" valign="top" style="font-size:13px;line-height:14px;padding-bottom:3px;">c.</td><td style="font-size:13px;line-height:14px;padding-bottom:3px;">This Agreement shall be governed by the laws of the state of {gen_prov_state}.</td></tr>
+            <tr><td width="20px" valign="top" style="font-size:13px;line-height:14px;padding-bottom:3px;">d.</td><td style="font-size:13px;line-height:14px;padding-bottom:3px;">This Agreement supersedes all prior agreements and understandings, oral or written, between Options and the undersigned with respect to the subject matter hereof.</td></tr>
+        </table>
     </div>
-        '''
+    '''
     
     # Signature section based on branch - with page break avoidance
     html += '<div style="page-break-inside: avoid; margin-top: 8px;">'
@@ -243,7 +248,7 @@ def get_top_margin_cont(branch):
         'amfvahomecare', 'amfvahomecare_staging', 'woflhomecare', 'woflhomecare_staging',
         'lzflhomecare', 'lzflhomecare_staging'
     ]
-    return "7px" if branch in margin_7px_branches else "14px"
+    return "4px" if branch in margin_7px_branches else "6px"
 
 def get_governing_state(branch):
     """Get governing state based on branch"""
