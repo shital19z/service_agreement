@@ -75,7 +75,7 @@ def generate_page1_cont(data):
         'blmdhomecare', 'blmdhomecare_staging', 'wpbflhomecare', 'wpbflhomecare_staging'
     ]
     
-    if branch in needs_assessment_branches:
+    if branch in needs_assessment_branches or clean_data.get('needs_assessment_text', '').strip() or clean_data.get('valuables_text', '').strip():
         _needs_assessment_body = clean_data.get('needs_assessment_text', '').strip() or (
             "When a Needs Assessment and a Plan of Care is conducted by Options staff, the associated $95 fee is "
             "waived for any ongoing case that requires more than thirty (30) service hours per week. Otherwise, "
@@ -216,7 +216,8 @@ def generate_page1_cont(data):
         '''
     
     # General Provisions - Governing State
-    gen_prov_state = get_governing_state(branch)
+    _general_provisions_custom = (clean_data.get('general_provisions_text') or '').strip()
+    gen_prov_state = _general_provisions_custom if _general_provisions_custom else get_governing_state(branch)
     html += f'''
     <div style="font-size:13px;margin-top:{top_margin};line-height:14px;">
         <p style="margin:3px 0;"><b><u>GENERAL PROVISIONS:</u></b></p>

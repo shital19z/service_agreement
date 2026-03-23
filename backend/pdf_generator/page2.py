@@ -80,8 +80,10 @@ def get_content_category(branch, care_state):
         return 'long'
     elif branch in medium_content_branches:
         return 'medium'
-    else:
+    elif branch in short_content_branches:
         return 'short'
+    else:
+        return 'long'
 
 def generate_page2(data):
     """
@@ -657,14 +659,18 @@ def generate_page2(data):
                 html += f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;"><b><u>Notice of Complaint Procedures</u></b></p>'
                 html += f'<p style="font-size:{base_font_size};margin:{section_margin} 0;">{complaint_proc_custom}</p>'
         else:
+            # ✅ FIX: Default branch now renders the FULL MD-equivalent content,
+            # matching Baltimore exactly — including point 2c (Adult/Child Protective
+            # Services), complaint #6 "give them an intake", and complaint #8
+            # Barbara Fagan appeal option.
             html += (
                 f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;"><b><u>Notice of Patients\' Rights and Responsibilities</u></b></p>'
                 f'<ol class="main-list" style="padding-left:{list_padding};margin:0;list-style-type:decimal;">'
                 f'<li style="margin-bottom:{list_margin};">A client, or the client representative with legal authority to make health care decisions, has the right to:'
                 f'<ol class="alpha-list" style="padding-left:14px;margin:0;list-style-type:lower-alpha;">'
-                f'<li style="margin-bottom:{list_margin};">Be treated with consideration, respect, and full recognition of the client dignity and individuality</li>'
+                f'<li style="margin-bottom:{list_margin};">Be treated with consideration, respect, and full recognition of the client\'s human dignity and individuality</li>'
                 f'<li style="margin-bottom:{list_margin};">Receive treatment, care, and services that are adequate, appropriate, and in compliance with relevant State, local, and federal laws and regulations</li>'
-                f'<li style="margin-bottom:{list_margin};">Participate in the development of the client care plan and medical treatment</li>'
+                f'<li style="margin-bottom:{list_margin};">Participate in the development of the client\'s care plan and medical treatment</li>'
                 f'<li style="margin-bottom:{list_margin};">Refuse treatment after the possible consequences of refusing treatment have been fully explained</li>'
                 f'<li style="margin-bottom:{list_margin};">Privacy</li>'
                 f'<li style="margin-bottom:{list_margin};">Be free from mental, verbal, sexual, and physical abuse, neglect, involuntary seclusion, and exploitation</li>'
@@ -674,13 +680,18 @@ def generate_page2(data):
                 f'<ol class="alpha-list" style="padding-left:14px;margin:0;list-style-type:lower-alpha;">'
                 f'<li style="margin-bottom:{list_margin};">Make suggestions or complaints, or present grievances on behalf of the client to the agency, government agencies, or other persons without the threat or fear of retaliation</li>'
                 f'<li style="margin-bottom:{list_margin};">Receive a prompt response, through an established complaint or grievance procedure, to any complaints, suggestions, or grievances the participant may have</li>'
+                f'<li style="margin-bottom:{list_margin};">Have access to the procedures for making a complaint to the Office of Health Care Quality - see (3) below, and to:'
+                f'<ol class="roman-list" style="padding-left:14px;margin:0;list-style-type:lower-roman;">'
+                f'<li style="margin-bottom:{list_margin};">The Adult Protective Services Program of the local department of social services, if the client is an adult; or</li>'
+                f'<li style="margin-bottom:{list_margin};">The Child Protective Services Program of the local department of social services, if the client is a minor</li>'
+                f'</ol></li>'
                 f'</ol></li>'
                 f'{md_hotline}'
                 f'<li style="margin-bottom:{list_margin};">A client or client representative has the responsibility to:'
                 f'<ol class="alpha-list" style="padding-left:14px;margin:0;list-style-type:lower-alpha;">'
-                f'<li style="margin-bottom:{list_margin};">Advise the Options office of any changes in the care recipient condition, or of any events that affect the care recipient service needs.</li>'
+                f'<li style="margin-bottom:{list_margin};">Advise the Options office of any changes in the care recipient\'s condition, or of any events that affect the care recipient\'s service needs.</li>'
                 f'<li style="margin-bottom:{list_margin};">Treat the Options caregivers with respect.</li>'
-                f'<li style="margin-bottom:{list_margin};">Pay Options invoices in a timely manner as indicated below under the Notice of Billing Procedures section.</li>'
+                f'<li style="margin-bottom:{list_margin};">Pay Options invoices in a timely manner as indicated below under the "Notice of Billing Procedures" section.</li>'
                 f'</ol></li></ol>'
                 f'<p style="font-size:{title_font_size};text-align:center;margin:{section_margin} 0;margin-top:{top_margin};"><b><u>Notice of Complaint Procedures</u></b></p>'
                 f'<ol class="main-list" style="padding-left:{list_padding};margin:0;list-style-type:decimal;">'
@@ -689,9 +700,9 @@ def generate_page2(data):
                 f'<li style="margin-bottom:{list_margin};">The OPTIONS employee who will be responsible for investigating complaints is the Community Relations Manager or the Care Manager.</li>'
                 f'<li style="margin-bottom:{list_margin};">OPTIONS will produce a written record of the findings of each complaint investigated.</li>'
                 f'<li style="margin-bottom:{list_margin};">The agency employee who will be responsible for review of investigation findings and resolution of the complaint will be the Community Relations Manager.</li>'
-                f'<li style="margin-bottom:{list_margin};">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient property.</li>'
+                f'<li style="margin-bottom:{list_margin};">The local social service department Adult Protective Services unit will be informed if at any stage of investigating or resolving a complaint the investigating employee deems that a practical resolution of the complaint is not possible, and that harm may result to the patient or to the patient\'s property. At such a point, the investigating employee will contact Adult Protective Services and give them an intake.</li>'
                 f'<li style="margin-bottom:{list_margin};">The Community Relations Manager is the agency employee who will, within 10 business days from the date of receipt of a complaint, provide written notification to the complainant of the proposed resolution.</li>'
-                f'<li style="margin-bottom:{list_margin};">If you are not satisfied with the proposed resolution, you may appeal to an agency Director at 1-800-2-OPTIONS, or in writing to OPTIONS Director, 555 Quince Orchard Road, Suite 240, Gaithersburg, MD 20878, in which case they would review the case and get back to you in writing within 21 days of receipt of the appeal.</li>'
+                f'<li style="margin-bottom:{list_margin};">If you are not satisfied with the proposed resolution, you may appeal to an agency Director at 1-800-2-OPTIONS, or in writing to OPTIONS Director, 555 Quince Orchard Road, Suite 240, Gaithersburg, MD 20878, in which case they would review the case and get back to you in writing within 21 days of receipt of the appeal. You may also write to Barbara Fagan, Survey Coordinator, Office of Health Care Quality, Bland Bryant Building, Spring Grove Hospital Center, 55 Wade Avenue, Catonsville, MD 21228, or you may call the State of Maryland\'s Residential Service Agency Hotline at 1-877-4MD-DHMH.</li>'
                 f'</ol>'
             )
 
@@ -699,8 +710,18 @@ def generate_page2(data):
     # ✅ KEY FIX: Use table-based layout instead of <ol><li> because xhtml2pdf
     # collapses list items with margin-bottom:0 into one run-on paragraph.
     # Tables always render each row on its own line regardless of content category.
-    billing_font = "7.5px"   # Slightly larger than base for readability
-    billing_row_padding = "3px 4px"
+    # Billing table uses explicit font-size on <td> cells.
+    # xhtml2pdf renders explicit td font-size smaller than inherited font-size
+    # on <li> items, so we bump billing font up to visually match.
+    if content_category == 'long':
+        billing_font = "8.5px"
+        billing_row_padding = "2px 4px"
+    elif content_category == 'medium':
+        billing_font = "8.5px"
+        billing_row_padding = "2px 4px"
+    else:  # short
+        billing_font = "9.5px"
+        billing_row_padding = "3px 4px"
 
     if billing_proc_custom:
         html += f'''

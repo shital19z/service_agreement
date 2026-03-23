@@ -321,10 +321,10 @@ const BranchesList = ({ token, onBranchesChanged, onCreateAgreement }) => {
                                     marginBottom: '8px',
                                     color: '#334155'
                                 }}>
-                                    <span style={{ fontSize: '16px' }}>💰</span>
+                                    {/* <span style={{ fontSize: '16px' }}>💰</span>
                                     <span style={{ fontSize: '14px' }}>
                                         Mileage: ${branch.mileage?.toFixed(2) || '0.67'}/mile
-                                    </span>
+                                    </span> */}
                                 </div>
                             </div>
 

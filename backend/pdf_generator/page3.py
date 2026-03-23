@@ -67,7 +67,31 @@ def generate_page3(data):
     
     print(f"DEBUG - Page 3 - Formatted care_name: '{care_name}'")
     print(f"DEBUG - Page 3 - Formatted clt_name: '{clt_name}'")
-    
+
+    # ── EFT body text: DB override or hardcoded default ───────────────────
+    eft_authorization_text = (data.get('eft_authorization_text') or '').strip()
+    _default_eft_para1 = (
+        'I, the undersigned, acknowledge that invoices prepared by Options for Senior America (Options) are due upon receipt, '
+        'and therefore hereby authorize Options to withdraw any amounts owed by me on the same day as the invoice is prepared '
+        'and emailed to me. This funds withdrawal is made by initiating an electronic funds transfer, as a debit through ACH '
+        '(Automated Clearing House) from my account at the financial institution (hereinafter \u201cBank\u201d) indicated below. '
+        'I also agree that, in the event the below mentioned care recipient passes away, I will not close this referenced bank '
+        'account until I receive notification from Options that the final Options invoice is paid in full using the method of '
+        'payment herein described. Furthermore, I authorize Bank to accept and to debit entries indicated by Options from my account.'
+    )
+    _default_eft_para2 = (
+        'This authorization is to remain in full force and effect until Options and Bank have received written notice from me '
+        'of its termination in such time and in such manner as to afford Options and Bank reasonable opportunity to act on it.'
+    )
+    if eft_authorization_text:
+        eft_body_html = f'<p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:15px 0 20px 0; line-height:1.5;">{eft_authorization_text}</p>'
+    else:
+        eft_body_html = (
+            f'<p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:15px 0 12px 0; line-height:1.5;">{_default_eft_para1}</p>'
+            f'<p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:12px 0 20px 0; line-height:1.5;">{_default_eft_para2}</p>'
+        )
+    # ─────────────────────────────────────────────────────────────────────
+
     html = '<div>'
     
     html += '''
@@ -75,11 +99,9 @@ def generate_page3(data):
     <p style="text-align: center; font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:4px 0 15px 0;">(Save time and postage. Avoid interest charges, late payments, and termination notices)</p>
     '''
     
+    html += eft_body_html
+    
     html += f'''
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:15px 0 12px 0; line-height:1.5;">I, the undersigned, acknowledge that invoices prepared by Options for Senior America (Options) are due upon receipt, and therefore hereby authorize Options to withdraw any amounts owed by me on the same day as the invoice is prepared and emailed to me. This funds withdrawal is made by initiating an electronic funds transfer, as a debit through ACH (Automated Clearing House) from my account at the financial institution (hereinafter "Bank") indicated below. I also agree that, in the event the below mentioned care recipient passes away, I will not close this referenced bank account until I receive notification from Options that the final Options invoice is paid in full using the method of payment herein described. Furthermore, I authorize Bank to accept and to debit entries indicated by Options from my account.</p>
-    
-    <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:12px 0 20px 0; line-height:1.5;">This authorization is to remain in full force and effect until Options and Bank have received written notice from me of its termination in such time and in such manner as to afford Options and Bank reasonable opportunity to act on it.</p>
-    
     <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:20px 0 8px 30px;">Care Recipient Name:&nbsp;&nbsp;<b>{care_name}</b></p>
     
     <p style="font-weight:400; font-size: 10pt; font-family: Calibri; font-style: normal; margin:8px 0 8px 30px;">Client Bank Account Signatory Name:&nbsp;&nbsp;<b>{clt_name}</b></p>

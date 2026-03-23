@@ -24,11 +24,9 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
     const [newBranchCode, setNewBranchCode] = useState('');
     const [branchCreationSuccess, setBranchCreationSuccess] = useState(false);
 
-    // Reset form when modal opens/closes or editing branch changes
     useEffect(() => {
         if (isOpen) {
             if (editingBranch) {
-                // Populate form with branch data for editing
                 setFormData({
                     branch_code: editingBranch.branch_code || '',
                     branch_name: editingBranch.branch_name || '',
@@ -45,10 +43,10 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
                 });
                 setBranchCreationSuccess(false);
             } else {
-                // Reset form for new branch
                 resetForm();
                 setBranchCreationSuccess(false);
             }
+            setShowCopyModal(false);
         }
     }, [isOpen, editingBranch]);
 
@@ -72,12 +70,17 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        
+        let processedValue = value;
+        if (name === 'branch_code' && !editingBranch) {
+            processedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        }
+        
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? checked : processedValue
         }));
         
-        // Clear error for this field when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -86,48 +89,36 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
     const validateForm = () => {
         const newErrors = {};
         
-        // Branch code validation
         if (!formData.branch_code.trim()) {
             newErrors.branch_code = 'Branch code is required';
         } else if (!/^[a-z0-9_]+$/.test(formData.branch_code)) {
             newErrors.branch_code = 'Branch code must contain only lowercase letters, numbers, and underscores';
         }
         
-        // Branch name validation
         if (!formData.branch_name.trim()) {
             newErrors.branch_name = 'Branch name is required';
         }
         
-        // Street validation
         if (!formData.street.trim()) {
             newErrors.street = 'Street address is required';
         }
         
-        // City validation
         if (!formData.city.trim()) {
             newErrors.city = 'City is required';
         }
         
-        // State validation
         if (!formData.branch_state.trim()) {
             newErrors.branch_state = 'State is required';
         } else if (!/^[A-Z]{2}$/.test(formData.branch_state.toUpperCase())) {
             newErrors.branch_state = 'State must be 2 letters (e.g., MD, VA, GA)';
         }
         
-        // ZIP code validation - accepts any format (US, international, etc.)
         if (!formData.zipcode.trim()) {
             newErrors.zipcode = 'ZIP code is required';
         }
         
-        // Phone validation (optional but if provided, validate format)
         if (formData.branch_phone && !/^[\d\s\-\(\)]+$/.test(formData.branch_phone)) {
             newErrors.branch_phone = 'Invalid phone format';
-        }
-        
-        // Mileage validation
-        if (formData.mileage && (formData.mileage < 0 || formData.mileage > 10)) {
-            newErrors.mileage = 'Mileage rate should be between 0 and 10';
         }
         
         return newErrors;
@@ -136,7 +127,6 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Validate form
         const newErrors = validateForm();
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -146,14 +136,12 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
         setLoading(true);
         
         try {
-            // Determine if creating or updating
             const url = editingBranch 
                 ? `${endpoint}/branches/${formData.branch_code}`
                 : `${endpoint}/branches`;
             
             const method = editingBranch ? 'PUT' : 'POST';
             
-            // Prepare data - convert state to uppercase
             const submitData = {
                 ...formData,
                 branch_state: formData.branch_state.toUpperCase()
@@ -172,19 +160,15 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
             
             if (response.ok) {
                 if (!editingBranch) {
-                    // New branch created - store the code and show copy modal
                     setNewBranchCode(formData.branch_code);
                     setBranchCreationSuccess(true);
                     setShowCopyModal(true);
-                    // Don't close the main modal yet
                 } else {
-                    // For editing, just refresh and close
                     alert('Branch updated successfully!');
                     onSave();
                     onClose();
                 }
             } else {
-                // Show error from server
                 alert(data.detail || 'Failed to save branch');
             }
         } catch (error) {
@@ -196,15 +180,21 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
     };
 
     const handleCopyComplete = (results) => {
-        const message = results?.agreements > 0 
-            ? `Branch created successfully!\n\nContent copied:\n• ${results.agreements} agreement settings\n• ${results.rates} rate settings`
+        const copiedItems = [];
+        if (results?.agreements > 0) copiedItems.push('✓ Agreement settings');
+        if (results?.rates > 0) copiedItems.push('✓ Rate settings');
+        if (results?.services > 0) copiedItems.push('✓ Service settings');
+        
+        const message = copiedItems.length > 0 
+            ? `Branch created successfully!\n\nContent copied:\n${copiedItems.join('\n')}`
             : 'Branch created successfully!';
         
         alert(message);
+        
         setShowCopyModal(false);
         setBranchCreationSuccess(false);
-        onSave(); // Refresh the branches list
-        onClose(); // Close the branch modal
+        onSave();
+        onClose();
     };
 
     const handleSkipCopy = () => {
@@ -239,7 +229,11 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
                                         onChange={handleChange}
                                         className={`form-input ${errors.branch_code ? 'input-error' : ''}`}
                                         placeholder="e.g., nyhomecare"
-                                        disabled={!!editingBranch} // Can't edit code after creation
+                                        disabled={!!editingBranch}
+                                        style={{ 
+                                            backgroundColor: editingBranch ? '#f5f5f5' : 'white',
+                                            textTransform: 'lowercase'
+                                        }}
                                     />
                                     {errors.branch_code && (
                                         <div className="error-text" style={{color: '#ef4444', fontSize: '12px', marginTop: '4px'}}>
@@ -248,7 +242,7 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
                                     )}
                                     {!editingBranch && (
                                         <small style={{color: '#64748b', fontSize: '11px'}}>
-                                            Use lowercase letters, numbers, and underscores only
+                                            Auto-formatted: lowercase letters, numbers, underscores only
                                         </small>
                                     )}
                                 </div>
@@ -386,57 +380,45 @@ const BranchModal = ({ isOpen, onClose, onSave, token, editingBranch = null }) =
                                         className="form-input"
                                     />
                                 </div>
-                                
-                                {/* Mileage Rate */}
-                                <div className="form-group">
-                                    <label>Mileage Rate ($/mile)</label>
-                                    <input
-                                        type="number"
-                                        name="mileage"
-                                        value={formData.mileage}
-                                        onChange={handleChange}
-                                        step="0.01"
-                                        min="0"
-                                        max="10"
-                                        className={`form-input ${errors.mileage ? 'input-error' : ''}`}
-                                    />
-                                    {errors.mileage && (
-                                        <div className="error-text" style={{color: '#ef4444', fontSize: '12px', marginTop: '4px'}}>
-                                            {errors.mileage}
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                {/* Checkboxes */}
-                                <div className="form-group" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <input
-                                            type="checkbox"
-                                            name="admin_meds"
-                                            checked={formData.admin_meds}
-                                            onChange={handleChange}
-                                        />
-                                        Admin Medications
-                                    </label>
-                                    
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <input
-                                            type="checkbox"
-                                            name="is_corporate"
-                                            checked={formData.is_corporate}
-                                            onChange={handleChange}
-                                        />
-                                        Corporate Branch
-                                    </label>
-                                </div>
                             </div>
                         </div>
                         
-                        <div className="modal-footer">
-                            <button type="button" onClick={onClose} className="cancel-btn">
+                        <div className="modal-footer" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', padding: '16px 24px', borderTop: '1px solid #e2e8f0' }}>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                style={{
+                                    padding: '10px 24px',
+                                    borderRadius: '8px',
+                                    border: '1.5px solid #cbd5e1',
+                                    backgroundColor: 'white',
+                                    color: '#475569',
+                                    fontSize: '14px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                }}
+                                onMouseOver={e => { e.target.style.backgroundColor = '#f8fafc'; e.target.style.borderColor = '#94a3b8'; }}
+                                onMouseOut={e => { e.target.style.backgroundColor = 'white'; e.target.style.borderColor = '#cbd5e1'; }}
+                            >
                                 Cancel
                             </button>
-                            <button type="submit" className="action-btn" disabled={loading}>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                style={{
+                                    padding: '10px 28px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: loading ? '#94a3b8' : 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                                    color: 'white',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                    boxShadow: loading ? 'none' : '0 2px 8px rgba(37, 99, 235, 0.35)',
+                                }}
+                                onMouseOver={e => { if (!loading) { e.target.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)'; e.target.style.boxShadow = '0 4px 12px rgba(37, 99, 235, 0.45)'; }}}
+                                onMouseOut={e => { if (!loading) { e.target.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)'; e.target.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.35)'; }}}
+                            >
                                 {loading ? 'Saving...' : (editingBranch ? 'Update Branch' : 'Create Branch')}
                             </button>
                         </div>

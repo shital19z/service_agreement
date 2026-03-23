@@ -90,10 +90,8 @@ def ensure_branch_content_exists():
     """Automatically create branch_content table and seed with branch-specific content"""
     db = SessionLocal()
     try:
-        # First, rollback any failed transaction
         db.rollback()
         
-        # Check if branch_content table exists
         try:
             result = db.execute(text("SELECT 1 FROM branch_content LIMIT 1")).fetchall()
             print("branch_content table already exists.")
@@ -103,7 +101,6 @@ def ensure_branch_content_exists():
             print("⚠️ branch_content table not found. Creating and seeding...")
             db.rollback()
         
-        # Create the table with FOREIGN KEY constraint
         db.execute(text("""
             CREATE TABLE IF NOT EXISTS branch_content (
                 id SERIAL PRIMARY KEY,
@@ -117,7 +114,6 @@ def ensure_branch_content_exists():
             );
         """))
         
-        # Create index for faster lookups
         db.execute(text("""
             CREATE INDEX IF NOT EXISTS idx_branch_content_branch_code 
             ON branch_content(branch_code);
@@ -126,11 +122,9 @@ def ensure_branch_content_exists():
         db.commit()
         print("✅ branch_content table ready.")
         
-        # Get all branches from tblbranch
         branches = db.execute(text("SELECT branch_code FROM tblbranch")).fetchall()
         print(f"\nFound {len(branches)} branches in database.")
         
-        # Default content template
         default_content = {
             "required_services": "",
             "freq_of_visit": "",
@@ -146,21 +140,17 @@ def ensure_branch_content_exists():
             "special_instructions": ""
         }
         
-        # Insert/Update content for each branch
         content_added = 0
         content_updated = 0
         
         for branch in branches:
             branch_code = branch[0]
             
-            # Get branch-specific config
             from branch_config import get_branch_config
             config = get_branch_config(branch_code, 'MD')
             
-            # Start with default content
             content_data = default_content.copy()
             
-            # Override with branch-specific values from config
             content_data.update({
                 "hourly_rate": config.get('hourly_rate', 36.00),
                 "notice_period": config.get('notice_period_text', '3 calendar days'),
@@ -170,14 +160,12 @@ def ensure_branch_content_exists():
                 "special_instructions": "Initial Contact Date required" if branch_code in ['scgahomecare', 'scgahomecare_staging', 'athomecare', 'athomecare_staging'] else ""
             })
             
-            # Check if content already exists
             existing = db.execute(
                 text("SELECT id FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"),
                 {"code": branch_code}
             ).fetchone()
             
             if existing:
-                # Update existing
                 db.execute(
                     text("""
                         UPDATE branch_content 
@@ -189,7 +177,6 @@ def ensure_branch_content_exists():
                 content_updated += 1
                 print(f"Updated content for {branch_code}")
             else:
-                # Insert new
                 db.execute(
                     text("""
                         INSERT INTO branch_content (branch_code, content_type, content_data, created_at, updated_at)
@@ -209,7 +196,6 @@ def ensure_branch_content_exists():
         print(f"Existing content updated: {content_updated}")
         print(f"{'='*50}")
         
-        # Show sample
         sample = db.execute(
             text("SELECT branch_code, content_data FROM branch_content LIMIT 1")
         ).first()
@@ -259,6 +245,7 @@ app.add_middleware(
 )
 
 # ===== OPTIONS HANDLERS =====
+# ⚠️ IMPORTANT: Static OPTIONS routes MUST come before parameterized ones
 @app.options("/agreements")
 async def agreements_options():
     return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "GET, POST, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
@@ -275,6 +262,16 @@ async def agreement_pdf_options():
 async def branches_options():
     return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "GET, POST, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
 
+# ✅ FIX: Static OPTIONS routes BEFORE parameterized /branches/{branch_code}
+@app.options("/branches/copy-content")
+async def copy_content_options():
+    return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "POST, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
+
+@app.options("/branches/sync")
+async def sync_options():
+    return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "POST, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
+
+# ⚠️ Parameterized OPTIONS routes come AFTER static ones
 @app.options("/branches/{branch_code}")
 async def branch_options():
     return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "GET, PUT, DELETE, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
@@ -282,10 +279,6 @@ async def branch_options():
 @app.options("/branches/{branch_code}/content")
 async def branch_content_options():
     return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "GET, PUT, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
-
-@app.options("/branches/copy-content")
-async def copy_content_options():
-    return JSONResponse(content={"message": "OK"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173","Access-Control-Allow-Methods": "POST, OPTIONS","Access-Control-Allow-Headers": "Authorization, Content-Type, Accept","Access-Control-Allow-Credentials": "true","Access-Control-Max-Age": "3600"})
 
 # ===== DEBUG ENDPOINT =====
 @app.get("/debug-auth")
@@ -534,10 +527,10 @@ def patch_agreement(agreement_id: int, agreement: dict, current_user: models.Use
                 setattr(existing_agreement, key, value)
         db.commit()
         db.refresh(existing_agreement)
-        print(f"✅ Agreement {agreement_id} partially updated with fields: {list(clean_data.keys())}")
+        print(f"Agreement {agreement_id} partially updated with fields: {list(clean_data.keys())}")
         return JSONResponse(content={"id": existing_agreement.id, "message": "Agreement updated successfully", "updated_fields": list(clean_data.keys())}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Credentials": "true"})
     except Exception as e:
-        print(f"❌ Error in patch_agreement: {e}")
+        print(f"Error in patch_agreement: {e}")
         import traceback
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Credentials": "true"})
@@ -640,7 +633,6 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
             branch_phone = branch.branch_phone or ""
             branch_fax = branch.branch_fax or getattr(branch, 'fax', '') or ""
 
-        # ── Read branch_content from DB (Edit Content saves here) ─────────────
         branch_content_row = db.execute(
             text("SELECT content_data FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"),
             {"code": agreement.branch_code}
@@ -649,7 +641,6 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
         if isinstance(branch_content, str):
             branch_content = json.loads(branch_content)
         print(f"[PDF] branch={agreement.branch_code} content_keys={list(branch_content.keys())}")
-        # ─────────────────────────────────────────────────────────────────────
 
         logo_path = Config.get_logo_path()
         if not logo_path:
@@ -695,7 +686,6 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
             "mileage_rate": f"{branch_mileage:.2f}",
             "vehicle_authorized": str(agreement.vehicle_authorized).lower(),
             "vehicle_authorization_initials": agreement.vehicle_authorization_initials or "",
-            # ✅ FIX: both key names for perc_charged
             "PercCharged": str(getattr(agreement, 'perc_charged', '100')),
             "perc_charged": str(getattr(agreement, 'perc_charged', '100')),
             "hazards":           getattr(agreement, 'hazards', None) or branch_content.get('hazards', 'None Reported'),
@@ -719,7 +709,6 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
             "account_type": agreement.account_type or "Checking",
             "client_signature": agreement.client_signature or "",
             "logo_path": logo_path,
-            # ── All Edit Content fields ───────────────────────────────────────
             "required_services_intro":      branch_content.get('required_services', ''),
             "notice_period_text":           branch_content.get('notice_period_text', ''),
             "needs_assessment_text":        branch_content.get('needs_assessment_text', ''),
@@ -738,11 +727,11 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
             "billing_procedures_text":      branch_content.get('billing_procedures_text', ''),
             "eft_authorization_text":       branch_content.get('eft_authorization_text', ''),
             "consumer_notice_text":         branch_content.get('consumer_notice_text', ''),
+            "general_provisions_text":      branch_content.get('general_provisions_text', ''),
             "holiday_count":                branch_content.get('holiday_count', 11),
             "has_initial_contact":          branch_content.get('has_initial_contact', False),
             "requires_consumer_notice":     branch_content.get('requires_consumer_notice', False),
             "notice_period":                branch_content.get('notice_period', '3 calendar days'),
-            # ─────────────────────────────────────────────────────────────────
         }
 
         pdf_stream = json_to_pdf(pdf_data)
@@ -756,7 +745,20 @@ def download_agreement_pdf(agreement_id: int, current_user: models.User = Depend
         print(f"Full traceback: {error_trace}")
         return JSONResponse(status_code=500, content={"detail": f"Internal PDF Generation Error: {str(e)}"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Allow-Credentials": "true"})
 
-# -------------------- BRANCHES API --------------------
+# ==================================================================================
+# BRANCHES API
+# ⚠️ ROUTE ORDER RULES — this order is MANDATORY, do not change it:
+#   1. GET    /branches              (list all)
+#   2. POST   /branches              (create new)
+#   3. POST   /branches/copy-content ← STATIC, must be BEFORE /{branch_code}
+#   4. POST   /branches/sync         ← STATIC, must be BEFORE /{branch_code}
+#   5. GET    /branches/{branch_code}        ← parameterized start here
+#   6. PUT    /branches/{branch_code}
+#   7. DELETE /branches/{branch_code}
+#   8. GET    /branches/{branch_code}/content
+#   9. PUT    /branches/{branch_code}/content
+# ==================================================================================
+
 @app.get("/branches")
 def get_branches(db: Session = Depends(get_db)):
     try:
@@ -789,7 +791,6 @@ def get_branches(db: Session = Depends(get_db)):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Credentials": "true"})
 
-# ===== BRANCH MANAGEMENT ENDPOINTS =====
 @app.post("/branches")
 def create_branch(branch: BranchCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
@@ -811,70 +812,7 @@ def create_branch(branch: BranchCreate, current_user: models.User = Depends(get_
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
 
-@app.put("/branches/{branch_code}")
-def update_branch(branch_code: str, branch: BranchCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    try:
-        existing = db.query(models.Branch).filter(models.Branch.branch_code == branch_code).first()
-        if not existing:
-            return JSONResponse(status_code=404, content={"detail": f"Branch '{branch_code}' not found"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-        for key, value in branch.dict().items():
-            if hasattr(existing, key):
-                setattr(existing, key, value)
-        db.commit()
-        return JSONResponse(content={"message": "Branch updated successfully"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-    except Exception as e:
-        db.rollback()
-        print(f"Error updating branch: {e}")
-        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-
-@app.delete("/branches/{branch_code}")
-def delete_branch(branch_code: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    try:
-        agreements_count = db.query(models.Agreement).filter(models.Agreement.branch_code == branch_code).count()
-        if agreements_count > 0:
-            return JSONResponse(status_code=400, content={"detail": f"Cannot delete branch with {agreements_count} agreement(s). Please reassign or delete the agreements first."}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-        db.execute(text("DELETE FROM branch_content WHERE branch_code = :code"), {"code": branch_code})
-        branch = db.query(models.Branch).filter(models.Branch.branch_code == branch_code).first()
-        if not branch:
-            return JSONResponse(status_code=404, content={"detail": f"Branch '{branch_code}' not found"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-        db.delete(branch)
-        db.commit()
-        return JSONResponse(content={"message": "Branch deleted successfully"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-    except Exception as e:
-        db.rollback()
-        print(f"Error deleting branch: {e}")
-        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-
-# ===== BRANCH CONTENT ENDPOINTS =====
-@app.get("/branches/{branch_code}/content")
-def get_branch_content(branch_code: str, db: Session = Depends(get_db)):
-    try:
-        result = db.execute(text("SELECT content_data FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"), {"code": branch_code}).first()
-        if result:
-            return JSONResponse(content=result[0], headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-        else:
-            default_content = {"required_services": "", "freq_of_visit": "", "hourly_rate": 36.00, "perc_charged": "100", "hazards": "None Reported", "mileage_rate": 0.67, "care_type": "Home Care", "has_initial_contact": False, "notice_period": "3 calendar days", "holiday_count": 11, "requires_consumer_notice": False, "special_instructions": ""}
-            return JSONResponse(content=default_content, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-    except Exception as e:
-        print(f"Error getting branch content: {e}")
-        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-
-@app.put("/branches/{branch_code}/content")
-def update_branch_content(branch_code: str, content: dict, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    try:
-        existing = db.execute(text("SELECT id FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"), {"code": branch_code}).first()
-        if existing:
-            db.execute(text("UPDATE branch_content SET content_data = :data, updated_at = CURRENT_TIMESTAMP WHERE branch_code = :code AND content_type = 'agreement'"), {"code": branch_code, "data": json.dumps(content)})
-        else:
-            db.execute(text("INSERT INTO branch_content (branch_code, content_type, content_data, created_at, updated_at) VALUES (:code, 'agreement', :data, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"), {"code": branch_code, "data": json.dumps(content)})
-        db.commit()
-        return JSONResponse(content={"message": "Branch content updated successfully"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-    except Exception as e:
-        db.rollback()
-        print(f"Error updating branch content: {e}")
-        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
-
-# ===== COPY CONTENT BETWEEN BRANCHES =====
+# ✅ STATIC route — defined BEFORE /{branch_code} parameterized routes
 @app.post("/branches/copy-content")
 def copy_branch_content(request: CopyContentRequest, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
@@ -921,7 +859,7 @@ def copy_branch_content(request: CopyContentRequest, current_user: models.User =
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
 
-# -------------------- BRANCH SYNC API --------------------
+# ✅ STATIC route — defined BEFORE /{branch_code} parameterized routes
 @app.post("/branches/sync")
 def sync_branches(db: Session = Depends(get_db)):
     from branch_config import BRANCH_DISPLAY_NAMES, get_branch_address
@@ -944,7 +882,70 @@ def sync_branches(db: Session = Depends(get_db)):
     results["total"] = len(results["created"]) + len(results["updated"])
     return JSONResponse(content={"message": "Branches synced successfully", "results": results}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Credentials": "true"})
 
-# ===== DEBUG: Check what's in branch_content DB =====
+# ⚠️ Parameterized routes come AFTER all static /branches/* routes
+@app.put("/branches/{branch_code}")
+def update_branch(branch_code: str, branch: BranchCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        existing = db.query(models.Branch).filter(models.Branch.branch_code == branch_code).first()
+        if not existing:
+            return JSONResponse(status_code=404, content={"detail": f"Branch '{branch_code}' not found"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+        for key, value in branch.dict().items():
+            if hasattr(existing, key):
+                setattr(existing, key, value)
+        db.commit()
+        return JSONResponse(content={"message": "Branch updated successfully"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+    except Exception as e:
+        db.rollback()
+        print(f"Error updating branch: {e}")
+        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+
+@app.delete("/branches/{branch_code}")
+def delete_branch(branch_code: str, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        agreements_count = db.query(models.Agreement).filter(models.Agreement.branch_code == branch_code).count()
+        if agreements_count > 0:
+            return JSONResponse(status_code=400, content={"detail": f"Cannot delete branch with {agreements_count} agreement(s). Please reassign or delete the agreements first."}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+        db.execute(text("DELETE FROM branch_content WHERE branch_code = :code"), {"code": branch_code})
+        branch = db.query(models.Branch).filter(models.Branch.branch_code == branch_code).first()
+        if not branch:
+            return JSONResponse(status_code=404, content={"detail": f"Branch '{branch_code}' not found"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+        db.delete(branch)
+        db.commit()
+        return JSONResponse(content={"message": "Branch deleted successfully"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+    except Exception as e:
+        db.rollback()
+        print(f"Error deleting branch: {e}")
+        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+
+@app.get("/branches/{branch_code}/content")
+def get_branch_content(branch_code: str, db: Session = Depends(get_db)):
+    try:
+        result = db.execute(text("SELECT content_data FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"), {"code": branch_code}).first()
+        if result:
+            return JSONResponse(content=result[0], headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+        else:
+            default_content = {"required_services": "", "freq_of_visit": "", "hourly_rate": 36.00, "perc_charged": "100", "hazards": "None Reported", "mileage_rate": 0.67, "care_type": "Home Care", "has_initial_contact": False, "notice_period": "3 calendar days", "holiday_count": 11, "requires_consumer_notice": False, "special_instructions": ""}
+            return JSONResponse(content=default_content, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+    except Exception as e:
+        print(f"Error getting branch content: {e}")
+        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+
+@app.put("/branches/{branch_code}/content")
+def update_branch_content(branch_code: str, content: dict, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        existing = db.execute(text("SELECT id FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"), {"code": branch_code}).first()
+        if existing:
+            db.execute(text("UPDATE branch_content SET content_data = :data, updated_at = CURRENT_TIMESTAMP WHERE branch_code = :code AND content_type = 'agreement'"), {"code": branch_code, "data": json.dumps(content)})
+        else:
+            db.execute(text("INSERT INTO branch_content (branch_code, content_type, content_data, created_at, updated_at) VALUES (:code, 'agreement', :data, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"), {"code": branch_code, "data": json.dumps(content)})
+        db.commit()
+        return JSONResponse(content={"message": "Branch content updated successfully"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+    except Exception as e:
+        db.rollback()
+        print(f"Error updating branch content: {e}")
+        return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173"})
+
+# -------------------- DEBUG & CONFIG ENDPOINTS --------------------
 @app.get("/debug/branch-content/{branch_code}")
 def debug_branch_content(branch_code: str, db: Session = Depends(get_db)):
     try:
@@ -965,6 +966,7 @@ def get_branch_config_api(branch_code: str, state_code: str = "MD"):
     except Exception as e:
         return JSONResponse(status_code=404, content={"detail": f"Branch config not found: {str(e)}"}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Credentials": "true"})
 
+# -------------------- SHARED AGREEMENT ENDPOINTS --------------------
 @app.get("/shared-agreement/{token}")
 def get_shared_agreement(token: str, db: Session = Depends(get_db)):
     try:
@@ -985,10 +987,6 @@ def get_shared_agreement(token: str, db: Session = Depends(get_db)):
         print(f"Error getting shared agreement: {e}")
         return JSONResponse(status_code=500, content={"detail": str(e)}, headers={"Access-Control-Allow-Origin": "http://localhost:5173", "Access-Control-Allow-Credentials": "true"})
 
-# ================================================================================
-# ✅ FIXED: get_shared_agreement_pdf — now fetches branch_content and passes all
-#    Edit Content fields into pdf_data (was missing before)
-# ================================================================================
 @app.get("/shared-agreement/{token}/pdf")
 def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
     try:
@@ -1011,7 +1009,6 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
         if branch:
             branch_data = {"Mileage": branch_mileage, "branch_code": branch.branch_code, "office_name": getattr(branch, 'office_name', '')}
 
-        # ✅ FIX: Fetch branch_content so Edit Content fields appear in shared PDF
         branch_content_row = db.execute(
             text("SELECT content_data FROM branch_content WHERE branch_code = :code AND content_type = 'agreement'"),
             {"code": agreement.branch_code}
@@ -1020,7 +1017,6 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
         if isinstance(branch_content, str):
             branch_content = json.loads(branch_content)
         print(f"[SharedPDF] branch={agreement.branch_code} content_keys={list(branch_content.keys())}")
-        # ─────────────────────────────────────────────────────────────────────
 
         logo_path = Config.get_logo_path()
 
@@ -1064,10 +1060,8 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
             "mileage_rate": f"{branch_mileage:.2f}",
             "vehicle_authorized": str(agreement.vehicle_authorized).lower(),
             "vehicle_authorization_initials": agreement.vehicle_authorization_initials or "",
-            # ✅ FIX: both key names for perc_charged
             "PercCharged": str(getattr(agreement, 'perc_charged', '100')),
             "perc_charged": str(getattr(agreement, 'perc_charged', '100')),
-            # Agreement-level fields, fall back to branch template
             "hazards":           getattr(agreement, 'hazards', None) or branch_content.get('hazards', 'None Reported'),
             "required_services": (
                 None
@@ -1089,7 +1083,6 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
             "account_type": agreement.account_type or "Checking",
             "client_signature": agreement.client_signature or "",
             "logo_path": logo_path,
-            # ✅ ALL Edit Content fields — now included in shared PDF too
             "notice_period_text":           branch_content.get('notice_period_text', ''),
             "needs_assessment_text":        branch_content.get('needs_assessment_text', ''),
             "valuables_text":               branch_content.get('valuables_text', ''),
@@ -1107,6 +1100,7 @@ def get_shared_agreement_pdf(token: str, db: Session = Depends(get_db)):
             "billing_procedures_text":      branch_content.get('billing_procedures_text', ''),
             "eft_authorization_text":       branch_content.get('eft_authorization_text', ''),
             "consumer_notice_text":         branch_content.get('consumer_notice_text', ''),
+            "general_provisions_text":      branch_content.get('general_provisions_text', ''),
             "holiday_count":                branch_content.get('holiday_count', 11),
             "has_initial_contact":          branch_content.get('has_initial_contact', False),
             "requires_consumer_notice":     branch_content.get('requires_consumer_notice', False),
